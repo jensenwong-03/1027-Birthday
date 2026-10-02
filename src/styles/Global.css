@@ -1,0 +1,28 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body,
+#root{
+    width:100%;
+    height:100%;
+}
+
+body{
+    font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;
+    background:#050816;
+    overflow:hidden;
+    color:white;
+}
+
+button{
+    font-family:inherit;
+}
+
+a{
+    text-decoration:none;
+    color:inherit;
+}

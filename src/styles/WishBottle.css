@@ -1,0 +1,2985 @@
+/* =========================================================
+   WISH BOTTLE PAGE
+========================================================= */
+
+.wish-bottle-page {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(40, 90, 150, 0.12),
+      transparent 45%
+    ),
+    #050816;
+
+  color: white;
+
+  font-family:
+    "Noto Sans SC",
+    "Microsoft YaHei",
+    sans-serif;
+}
+
+
+/* =========================================================
+   MAIN GAME
+========================================================= */
+
+.wish-bottle-game {
+  position: relative;
+
+  width: min(
+    94vw,
+    1000px
+  );
+
+  height: min(
+    92vh,
+    700px
+  );
+
+  margin: auto;
+
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+.wish-hud {
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  width: min(
+    900px,
+    92vw
+  );
+
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  align-items: center;
+
+  z-index: 20;
+
+  padding:
+    0 10px;
+}
+
+
+/* =========================================================
+   SHIELD
+========================================================= */
+
+.shield-display,
+.energy-display {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    11px 16px;
+
+  border:
+    1px solid
+    rgba(
+      150,
+      220,
+      255,
+      0.16
+    );
+
+  border-radius: 14px;
+
+  background:
+    rgba(
+      5,
+      18,
+      35,
+      0.52
+    );
+
+  backdrop-filter:
+    blur(12px);
+
+  box-shadow:
+    0 0 25px
+      rgba(
+        60,
+        170,
+        255,
+        0.05
+      );
+}
+
+
+.shield-display > span,
+.energy-display > span {
+  color:
+    rgba(
+      225,
+      242,
+      255,
+      0.78
+    );
+
+  font-size: 13px;
+
+  letter-spacing:
+    1.2px;
+}
+
+
+.shield-icons {
+  display: flex;
+
+  gap: 5px;
+}
+
+
+.shield {
+  font-size: 17px;
+
+  transition:
+    all 0.3s ease;
+}
+
+
+.shield.active {
+  color:
+    rgba(
+      190,
+      235,
+      255,
+      0.95
+    );
+
+  text-shadow:
+    0 0 10px
+      rgba(
+        100,
+        210,
+        255,
+        0.8
+      );
+}
+
+
+.shield.empty {
+  color:
+    rgba(
+      120,
+      140,
+      160,
+      0.2
+    );
+
+  filter:
+    grayscale(1);
+}
+
+
+/* =========================================================
+   ENERGY
+========================================================= */
+
+.energy-display {
+  display: grid;
+
+  grid-template-columns:
+    auto auto;
+
+  gap:
+    4px 12px;
+}
+
+
+.energy-display > span {
+  grid-column: 1;
+}
+
+
+.energy-display strong {
+  grid-column: 2;
+
+  font-size: 15px;
+
+  font-weight: 500;
+
+  color:
+    rgba(
+      240,
+      250,
+      255,
+      0.95
+    );
+}
+
+
+.wish-progress {
+  grid-column:
+    1 / 3;
+
+  width: 170px;
+
+  height: 4px;
+
+  overflow: hidden;
+
+  border-radius: 99px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+}
+
+
+.wish-progress-fill {
+  height: 100%;
+
+  border-radius: 99px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(
+        120,
+        205,
+        255,
+        0.55
+      ),
+      rgba(
+        220,
+        245,
+        255,
+        0.95
+      )
+    );
+
+  box-shadow:
+    0 0 12px
+      rgba(
+        130,
+        220,
+        255,
+        0.7
+      );
+
+  transition:
+    width 0.35s ease;
+}
+
+
+/* =========================================================
+   GAME AREA
+========================================================= */
+
+.wish-game-area {
+  position: absolute;
+
+  left: 50%;
+  top: 58px;
+
+  transform:
+    translateX(-50%);
+
+  width: min(
+    900px,
+    92vw
+  );
+
+  aspect-ratio:
+    900 / 560;
+
+  max-height:
+    calc(
+      92vh - 110px
+    );
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(
+      150,
+      220,
+      255,
+      0.12
+    );
+
+  border-radius: 24px;
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(
+        50,
+        110,
+        180,
+        0.09
+      ),
+      transparent 48%
+    ),
+    rgba(
+      2,
+      8,
+      20,
+      0.35
+    );
+
+  box-shadow:
+    inset 0 0 70px
+      rgba(
+        20,
+        90,
+        150,
+        0.06
+      ),
+    0 0 60px
+      rgba(
+        30,
+        130,
+        200,
+        0.04
+      );
+
+  touch-action:
+    none;
+}
+
+
+/* =========================================================
+   FALLING STAR
+========================================================= */
+
+.falling-star {
+  position: absolute;
+
+  z-index: 6;
+
+  line-height: 1;
+
+  color:
+    rgba(
+      225,
+      245,
+      255,
+      0.95
+    );
+
+  pointer-events: none;
+
+  user-select: none;
+
+  text-shadow:
+    0 0 8px
+      rgba(
+        150,
+        220,
+        255,
+        0.9
+      ),
+    0 0 22px
+      rgba(
+        100,
+        190,
+        255,
+        0.55
+      );
+}
+
+
+.special-star {
+  color:
+    rgba(
+      255,
+      245,
+      205,
+      1
+    );
+
+  text-shadow:
+    0 0 10px
+      rgba(
+        255,
+        245,
+        190,
+        1
+      ),
+    0 0 28px
+      rgba(
+        255,
+        220,
+        120,
+        0.8
+      );
+
+  animation:
+    specialStarPulse
+    0.9s
+    ease-in-out
+    infinite alternate;
+}
+
+
+@keyframes specialStarPulse {
+
+  from {
+    filter:
+      brightness(1);
+  }
+
+  to {
+    filter:
+      brightness(1.45);
+  }
+}
+
+
+/* =========================================================
+   WISH BOTTLE
+========================================================= */
+
+.wish-bottle {
+  position: absolute;
+
+  bottom: 10px;
+
+  width:
+    120px;
+
+  height:
+    90px;
+
+  z-index: 10;
+
+  cursor:
+    grab;
+
+  user-select: none;
+
+  touch-action:
+    none;
+
+  transition:
+    filter 0.15s ease;
+}
+
+
+.wish-bottle.bottle-dragging {
+  cursor:
+    grabbing;
+
+  filter:
+    brightness(1.12);
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* =========================================================
+   BOTTLE NECK
+========================================================= */
+
+.bottle-neck {
+  position: absolute;
+
+  left: 50%;
+
+  top: 0;
+
+  transform:
+    translateX(-50%);
+
+  width: 28px;
+
+  height: 25px;
+
+  border:
+    1px solid
+    rgba(
+      190,
+      235,
+      255,
+      0.35
+    );
+
+  border-bottom:
+    none;
+
+  border-radius:
+    8px 8px 0 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(
+        150,
+        220,
+        255,
+        0.16
+      ),
+      rgba(
+        80,
+        150,
+        220,
+        0.07
+      )
+    );
+
+  backdrop-filter:
+    blur(4px);
+}
+
+
+/* =========================================================
+   BOTTLE BODY
+========================================================= */
+
+.bottle-body {
+  position: absolute;
+
+  left: 50%;
+
+  bottom: 0;
+
+  transform:
+    translateX(-50%);
+
+  width: 92px;
+
+  height: 72px;
+
+  border:
+    1px solid
+    rgba(
+      180,
+      230,
+      255,
+      0.4
+    );
+
+  border-radius:
+    20px 20px 28px 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        130,
+        215,
+        255,
+        0.15
+      ),
+      rgba(
+        30,
+        100,
+        170,
+        0.08
+      )
+    );
+
+  backdrop-filter:
+    blur(5px);
+
+  box-shadow:
+    inset 0 0 18px
+      rgba(
+        160,
+        230,
+        255,
+        0.08
+      ),
+    0 0 22px
+      rgba(
+        80,
+        190,
+        255,
+        0.12
+      );
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   BOTTLE GLOW
+========================================================= */
+
+.bottle-glow {
+  position: absolute;
+
+  inset: -30px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        150,
+        225,
+        255,
+        0.16
+      ),
+      transparent 65%
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   STARS INSIDE BOTTLE
+========================================================= */
+
+.bottle-stars {
+  position: absolute;
+
+  inset: 12px;
+
+  display: flex;
+
+  align-content:
+    center;
+
+  justify-content:
+    center;
+
+  flex-wrap: wrap;
+
+  gap: 3px;
+
+  color:
+    rgba(
+      225,
+      245,
+      255,
+      0.9
+    );
+
+  font-size: 11px;
+
+  text-shadow:
+    0 0 7px
+      rgba(
+        130,
+        220,
+        255,
+        0.9
+      );
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.wish-message {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+
+  z-index: 30;
+
+  padding:
+    10px 22px;
+
+  border:
+    1px solid
+    rgba(
+      190,
+      235,
+      255,
+      0.18
+    );
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(
+      5,
+      18,
+      35,
+      0.65
+    );
+
+  backdrop-filter:
+    blur(12px);
+
+  color:
+    rgba(
+      235,
+      248,
+      255,
+      0.95
+    );
+
+  font-size:
+    14px;
+
+  letter-spacing:
+    1px;
+
+  pointer-events:
+    none;
+
+  animation:
+    messageAppear
+    0.25s
+    ease-out;
+}
+
+
+@keyframes messageAppear {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translate(
+        -50%,
+        calc(-50% + 8px)
+      );
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      );
+  }
+}
+
+
+/* =========================================================
+   START OVERLAY
+========================================================= */
+
+.wish-start-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 100;
+
+  display: flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding: 30px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(
+        20,
+        70,
+        120,
+        0.14
+      ),
+      rgba(
+        2,
+        7,
+        18,
+        0.82
+      ) 70%
+    );
+
+  backdrop-filter:
+    blur(8px);
+}
+
+
+/* =========================================================
+   BRIEFING CARD
+========================================================= */
+
+.wish-briefing-card {
+  position: relative;
+
+  width:
+    min(
+      450px,
+      78%
+    );
+
+  padding:
+    30px 34px 24px;
+
+  text-align:
+    center;
+
+  border:
+    1px solid
+    rgba(
+      160,
+      220,
+      255,
+      0.2
+    );
+
+  border-radius:
+    22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        10,
+        32,
+        55,
+        0.72
+      ),
+      rgba(
+        3,
+        12,
+        27,
+        0.82
+      )
+    );
+
+  backdrop-filter:
+    blur(18px);
+
+  box-shadow:
+    0 0 60px
+      rgba(
+        70,
+        180,
+        255,
+        0.08
+      ),
+    inset 0 0 35px
+      rgba(
+        130,
+        210,
+        255,
+        0.025
+      );
+
+  animation:
+    briefingAppear
+    0.8s
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    );
+}
+
+
+@keyframes briefingAppear {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* =========================================================
+   BRIEFING TOPLINE
+========================================================= */
+
+.briefing-topline {
+  font-size:
+    10px;
+
+  letter-spacing:
+    4px;
+
+  color:
+    rgba(
+      165,
+      215,
+      240,
+      0.55
+    );
+
+  margin-bottom:
+    12px;
+}
+
+
+/* =========================================================
+   SYMBOL
+========================================================= */
+
+.briefing-symbol {
+  font-size:
+    36px;
+
+  line-height: 1;
+
+  color:
+    rgba(
+      225,
+      245,
+      255,
+      0.95
+    );
+
+  text-shadow:
+    0 0 15px
+      rgba(
+        140,
+        220,
+        255,
+        0.75
+      ),
+    0 0 35px
+      rgba(
+        90,
+        190,
+        255,
+        0.35
+      );
+
+  animation:
+    briefingSymbolPulse
+    2s
+    ease-in-out
+    infinite;
+}
+
+
+@keyframes briefingSymbolPulse {
+
+  0%,
+  100% {
+    transform:
+      scale(1);
+
+    opacity:
+      0.85;
+  }
+
+  50% {
+    transform:
+      scale(1.1);
+
+    opacity:
+      1;
+  }
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.wish-briefing-card h2 {
+  margin:
+    11px 0 12px;
+
+  font-size:
+    28px;
+
+  font-weight:
+    400;
+
+  letter-spacing:
+    5px;
+
+  color:
+    rgba(
+      240,
+      249,
+      255,
+      0.95
+    );
+}
+
+
+/* =========================================================
+   BRIEFING LINE
+========================================================= */
+
+.briefing-line {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    12px;
+
+  margin:
+    0 auto 20px;
+
+  width:
+    180px;
+}
+
+
+.briefing-line span {
+  flex: 1;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(
+        160,
+        220,
+        255,
+        0.35
+      )
+    );
+}
+
+
+.briefing-line span:last-child {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(
+        160,
+        220,
+        255,
+        0.35
+      ),
+      transparent
+    );
+}
+
+
+.briefing-line i {
+  font-style:
+    normal;
+
+  font-size:
+    11px;
+
+  color:
+    rgba(
+      200,
+      235,
+      255,
+      0.8
+    );
+}
+
+
+/* =========================================================
+   MAIN BRIEFING TEXT
+========================================================= */
+
+.briefing-main {
+  margin:
+    0 0 22px;
+
+  color:
+    rgba(
+      225,
+      240,
+      250,
+      0.86
+    );
+
+  font-size:
+    15px;
+
+  line-height:
+    1.9;
+
+  letter-spacing:
+    2px;
+}
+
+
+/* =========================================================
+   RULE CONTAINER
+========================================================= */
+
+.intro-rules {
+  width:
+    100%;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  margin:
+    0 auto 23px;
+
+  text-align:
+    center;
+}
+
+
+/* =========================================================
+   RULE
+========================================================= */
+
+.intro-rule {
+  width:
+    310px;
+
+  max-width:
+    100%;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    24px 1fr;
+
+  align-items:
+    center;
+
+  column-gap:
+    12px;
+
+  margin:
+    7px auto;
+
+  text-align:
+    left;
+
+  color:
+    rgba(
+      215,
+      235,
+      248,
+      0.72
+    );
+
+  font-size:
+    13px;
+
+  letter-spacing:
+    1.2px;
+
+  line-height:
+    1.5;
+}
+
+
+.rule-icon {
+  width:
+    24px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  color:
+    rgba(
+      180,
+      225,
+      250,
+      0.82
+    );
+
+  font-size:
+    15px;
+
+  text-shadow:
+    0 0 9px
+      rgba(
+        100,
+        200,
+        255,
+        0.45
+      );
+}
+
+
+/* =========================================================
+   START BUTTON
+========================================================= */
+
+.briefing-start-btn {
+  position:
+    relative;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    16px;
+
+  min-width:
+    180px;
+
+  padding:
+    12px 22px;
+
+  border:
+    1px solid
+    rgba(
+      180,
+      230,
+      255,
+      0.35
+    );
+
+  border-radius:
+    999px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(
+        80,
+        160,
+        220,
+        0.2
+      ),
+      rgba(
+        100,
+        200,
+        255,
+        0.07
+      )
+    );
+
+  color:
+    rgba(
+      235,
+      248,
+      255,
+      0.94
+    );
+
+  font-family:
+    inherit;
+
+  font-size:
+    14px;
+
+  letter-spacing:
+    2px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.3s ease;
+
+  overflow:
+    hidden;
+}
+
+
+.briefing-start-btn::before {
+  content: "";
+
+  position:
+    absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      110deg,
+      transparent,
+      rgba(
+        255,
+        255,
+        255,
+        0.12
+      ),
+      transparent
+    );
+
+  transform:
+    translateX(-120%);
+
+  transition:
+    transform 0.6s ease;
+}
+
+
+.briefing-start-btn:hover::before {
+  transform:
+    translateX(120%);
+}
+
+
+.briefing-start-btn:hover {
+  border-color:
+    rgba(
+      200,
+      240,
+      255,
+      0.65
+    );
+
+  box-shadow:
+    0 0 28px
+      rgba(
+        90,
+        190,
+        255,
+        0.16
+      );
+
+  transform:
+    translateY(-2px);
+}
+
+
+.button-arrow {
+  font-size:
+    18px;
+
+  opacity:
+    0.7;
+
+  transition:
+    transform 0.3s ease;
+}
+
+
+.briefing-start-btn:hover
+.button-arrow {
+  transform:
+    translateX(4px);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.briefing-footer {
+  margin-top:
+    18px;
+
+  color:
+    rgba(
+      160,
+      195,
+      215,
+      0.32
+    );
+
+  font-size:
+    8px;
+
+  letter-spacing:
+    2.5px;
+}
+
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+.wish-countdown-overlay {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  z-index:
+    110;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        20,
+        75,
+        125,
+        0.2
+      ),
+      rgba(
+        2,
+        8,
+        20,
+        0.76
+      )
+    );
+
+  backdrop-filter:
+    blur(4px);
+
+  overflow:
+    hidden;
+}
+
+
+.countdown-number {
+  position:
+    relative;
+
+  z-index:
+    5;
+
+  font-size:
+    clamp(
+      100px,
+      16vw,
+      160px
+    );
+
+  font-weight:
+    200;
+
+  line-height:
+    1;
+
+  color:
+    rgba(
+      235,
+      248,
+      255,
+      0.95
+    );
+
+  text-shadow:
+    0 0 20px
+      rgba(
+        120,
+        215,
+        255,
+        0.8
+      ),
+    0 0 60px
+      rgba(
+        80,
+        180,
+        255,
+        0.4
+      );
+
+  animation:
+    countdownNumber
+    0.85s
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    );
+}
+
+
+@keyframes countdownNumber {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(1.6);
+
+    filter:
+      blur(10px);
+  }
+
+  35% {
+    opacity:
+      1;
+
+    transform:
+      scale(1);
+  }
+
+  100% {
+    opacity:
+      0.85;
+
+    transform:
+      scale(0.92);
+
+    filter:
+      blur(0);
+  }
+}
+
+
+.countdown-caption {
+  position:
+    absolute;
+
+  bottom:
+    90px;
+
+  left:
+    50%;
+
+  transform:
+    translateX(-50%);
+
+  color:
+    rgba(
+      200,
+      230,
+      245,
+      0.45
+    );
+
+  font-size:
+    11px;
+
+  letter-spacing:
+    3px;
+
+  white-space:
+    nowrap;
+}
+
+
+.countdown-start {
+  position:
+    relative;
+
+  z-index:
+    5;
+
+  text-align:
+    center;
+
+  animation:
+    startFlash
+    0.8s
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    );
+}
+
+
+@keyframes startFlash {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(0.5);
+
+    filter:
+      blur(12px);
+  }
+
+  45% {
+    opacity:
+      1;
+
+    transform:
+      scale(1.08);
+
+    filter:
+      blur(0);
+  }
+
+  100% {
+    opacity:
+      1;
+
+    transform:
+      scale(1);
+  }
+}
+
+
+.countdown-start-symbol {
+  font-size:
+    45px;
+
+  color:
+    rgba(
+      235,
+      250,
+      255,
+      1
+    );
+
+  text-shadow:
+    0 0 20px
+      rgba(
+        150,
+        230,
+        255,
+        1
+      ),
+    0 0 60px
+      rgba(
+        100,
+        200,
+        255,
+        0.7
+      );
+}
+
+
+.countdown-start-text {
+  margin-top:
+    8px;
+
+  font-size:
+    48px;
+
+  font-weight:
+    300;
+
+  letter-spacing:
+    10px;
+
+  padding-left:
+    10px;
+
+  color:
+    rgba(
+      240,
+      250,
+      255,
+      0.98
+    );
+}
+
+
+.countdown-start-sub {
+  margin-top:
+    12px;
+
+  font-size:
+    9px;
+
+  letter-spacing:
+    4px;
+
+  color:
+    rgba(
+      180,
+      215,
+      235,
+      0.42
+    );
+}
+
+
+/* =========================================================
+   ORBITS
+========================================================= */
+
+.countdown-orbit {
+  position:
+    absolute;
+
+  left:
+    50%;
+
+  top:
+    50%;
+
+  width:
+    300px;
+
+  height:
+    300px;
+
+  border:
+    1px solid
+    rgba(
+      140,
+      220,
+      255,
+      0.09
+    );
+
+  border-radius:
+    50%;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+
+  pointer-events:
+    none;
+}
+
+
+.orbit-one {
+  animation:
+    orbitSpin
+    7s
+    linear
+    infinite;
+}
+
+
+.orbit-two {
+  width:
+    430px;
+
+  height:
+    430px;
+
+  border-color:
+    rgba(
+      140,
+      220,
+      255,
+      0.045
+    );
+
+  animation:
+    orbitSpinReverse
+    12s
+    linear
+    infinite;
+}
+
+
+@keyframes orbitSpin {
+
+  from {
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      rotate(360deg);
+  }
+}
+
+
+@keyframes orbitSpinReverse {
+
+  from {
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      rotate(360deg);
+  }
+
+  to {
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      rotate(0deg);
+  }
+}
+
+
+/* =========================================================
+   COUNTDOWN GLOW
+========================================================= */
+
+.countdown-glow {
+  position:
+    absolute;
+
+  left:
+    50%;
+
+  top:
+    50%;
+
+  width:
+    250px;
+
+  height:
+    250px;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+
+  border-radius:
+    50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        110,
+        210,
+        255,
+        0.16
+      ),
+      transparent 68%
+    );
+
+  filter:
+    blur(15px);
+
+  animation:
+    countdownGlow
+    1s
+    ease-in-out
+    infinite alternate;
+}
+
+
+@keyframes countdownGlow {
+
+  from {
+    opacity:
+      0.55;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(0.85);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(1.15);
+  }
+}
+
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+.wish-overlay {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  z-index:
+    120;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    25px;
+
+  background:
+    rgba(
+      2,
+      8,
+      20,
+      0.72
+    );
+
+  backdrop-filter:
+    blur(12px);
+
+  animation:
+    resultOverlay
+    0.5s
+    ease-out;
+}
+
+
+@keyframes resultOverlay {
+
+  from {
+    opacity:
+      0;
+  }
+
+  to {
+    opacity:
+      1;
+  }
+}
+
+
+.wish-result {
+  width:
+    min(
+      430px,
+      88%
+    );
+
+  padding:
+    42px 35px;
+
+  text-align:
+    center;
+
+  border:
+    1px solid
+    rgba(
+      170,
+      225,
+      255,
+      0.18
+    );
+
+  border-radius:
+    22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        10,
+        32,
+        55,
+        0.82
+      ),
+      rgba(
+        3,
+        12,
+        26,
+        0.9
+      )
+    );
+
+  box-shadow:
+    0 0 50px
+      rgba(
+        60,
+        180,
+        255,
+        0.08
+      );
+
+  animation:
+    resultCard
+    0.6s
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    );
+}
+
+
+@keyframes resultCard {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(15px)
+      scale(0.96);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+.result-tag {
+  margin:
+    0 0 18px;
+
+  font-size:
+    9px;
+
+  letter-spacing:
+    3px;
+
+  color:
+    rgba(
+      170,
+      215,
+      240,
+      0.45
+    );
+}
+
+
+.result-symbol {
+  font-size:
+    36px;
+
+  color:
+    rgba(
+      220,
+      240,
+      250,
+      0.9
+    );
+
+  text-shadow:
+    0 0 18px
+      rgba(
+        100,
+        210,
+        255,
+        0.7
+      );
+
+  margin-bottom:
+    10px;
+}
+
+
+.result-symbol.success {
+  color:
+    rgba(
+      235,
+      250,
+      255,
+      1
+    );
+
+  animation:
+    successPulse
+    1.6s
+    ease-in-out
+    infinite;
+}
+
+
+@keyframes successPulse {
+
+  0%,
+  100% {
+    transform:
+      scale(1);
+  }
+
+  50% {
+    transform:
+      scale(1.12);
+  }
+}
+
+
+.wish-result h2 {
+  margin:
+    0 0 18px;
+
+  font-size:
+    27px;
+
+  font-weight:
+    400;
+
+  letter-spacing:
+    4px;
+
+  color:
+    rgba(
+      240,
+      249,
+      255,
+      0.95
+    );
+}
+
+
+.wish-result > p:not(.result-tag):not(.progress-text) {
+  margin:
+    0;
+
+  color:
+    rgba(
+      215,
+      235,
+      248,
+      0.68
+    );
+
+  font-size:
+    14px;
+
+  line-height:
+    2;
+
+  letter-spacing:
+    1px;
+}
+
+
+.result-divider {
+  margin:
+    24px auto;
+
+  color:
+    rgba(
+      160,
+      220,
+      255,
+      0.55
+    );
+
+  font-size:
+    12px;
+}
+
+
+.completion-stars {
+  margin:
+    22px 0;
+
+  font-size:
+    20px;
+
+  letter-spacing:
+    9px;
+
+  color:
+    rgba(
+      225,
+      245,
+      255,
+      0.9
+    );
+
+  text-shadow:
+    0 0 12px
+      rgba(
+        120,
+        220,
+        255,
+        0.7
+      );
+}
+
+
+.progress-text {
+  margin:
+    22px 0;
+
+  color:
+    rgba(
+      175,
+      210,
+      230,
+      0.55
+    );
+
+  font-size:
+    11px;
+
+  line-height:
+    1.8;
+
+  letter-spacing:
+    2px;
+}
+
+
+.progress-text strong {
+  font-size:
+    26px;
+
+  font-weight:
+    400;
+
+  color:
+    rgba(
+      230,
+      248,
+      255,
+      0.95
+    );
+}
+
+
+.wish-result button {
+  margin-top:
+    10px;
+
+  min-width:
+    160px;
+
+  padding:
+    12px 25px;
+
+  border:
+    1px solid
+    rgba(
+      180,
+      230,
+      255,
+      0.28
+    );
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(
+      100,
+      190,
+      240,
+      0.08
+    );
+
+  color:
+    rgba(
+      235,
+      248,
+      255,
+      0.92
+    );
+
+  font-family:
+    inherit;
+
+  font-size:
+    13px;
+
+  letter-spacing:
+    2px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.3s ease;
+}
+
+
+.wish-result button:hover {
+  border-color:
+    rgba(
+      200,
+      240,
+      255,
+      0.55
+    );
+
+  background:
+    rgba(
+      100,
+      190,
+      240,
+      0.14
+    );
+
+  box-shadow:
+    0 0 25px
+      rgba(
+        80,
+        190,
+        255,
+        0.12
+      );
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* =========================================================
+   BOTTOM HINT
+========================================================= */
+
+.wish-hint {
+  position:
+    absolute;
+
+  left:
+    50%;
+
+  bottom:
+    0;
+
+  transform:
+    translateX(-50%);
+
+  margin:
+    0;
+
+  color:
+    rgba(
+      180,
+      210,
+      225,
+      0.38
+    );
+
+  font-size:
+    11px;
+
+  letter-spacing:
+    1.5px;
+
+  white-space:
+    nowrap;
+
+  z-index:
+    20;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+  max-width: 700px
+) {
+
+  .wish-bottle-game {
+    width:
+      100vw;
+
+    height:
+      100vh;
+
+    top:
+      0;
+
+    transform:
+      none;
+  }
+
+
+  .wish-hud {
+    top:
+      18px;
+
+    width:
+      92vw;
+
+    gap:
+      8px;
+  }
+
+
+  .shield-display,
+  .energy-display {
+    padding:
+      8px 10px;
+
+    gap:
+      7px;
+
+    border-radius:
+      11px;
+  }
+
+
+  .shield-display > span,
+  .energy-display > span {
+    font-size:
+      10px;
+  }
+
+
+  .shield {
+    font-size:
+      14px;
+  }
+
+
+  .wish-progress {
+    width:
+      110px;
+  }
+
+
+  .wish-game-area {
+    top:
+      75px;
+
+    width:
+      94vw;
+
+    max-height:
+      calc(
+        100vh - 135px
+      );
+
+    border-radius:
+      18px;
+  }
+
+
+  .wish-hint {
+    bottom:
+      17px;
+
+    width:
+      90vw;
+
+    text-align:
+      center;
+
+    font-size:
+      9px;
+
+    white-space:
+      normal;
+  }
+
+
+  .wish-briefing-card {
+    width:
+      82%;
+
+    padding:
+      28px 20px 22px;
+
+    border-radius:
+      19px;
+  }
+
+
+  .briefing-topline {
+    font-size:
+      8px;
+
+    letter-spacing:
+      2.5px;
+  }
+
+
+  .briefing-symbol {
+    font-size:
+      32px;
+  }
+
+
+  .wish-briefing-card h2 {
+    font-size:
+      25px;
+
+    letter-spacing:
+      4px;
+  }
+
+
+  .briefing-main {
+    font-size:
+      14px;
+
+    line-height:
+      1.9;
+  }
+
+
+  .intro-rule {
+    width:
+      285px;
+
+    font-size:
+      12px;
+
+    column-gap:
+      8px;
+
+    letter-spacing:
+      0.8px;
+  }
+
+
+  .briefing-start-btn {
+    min-width:
+      175px;
+
+    padding:
+      12px 20px;
+
+    font-size:
+      12px;
+  }
+
+
+  .briefing-footer {
+    font-size:
+      6px;
+
+    letter-spacing:
+      1.7px;
+  }
+
+
+  .countdown-number {
+    font-size:
+      110px;
+  }
+
+
+  .countdown-start-text {
+    font-size:
+      40px;
+
+    letter-spacing:
+      7px;
+  }
+
+
+  .countdown-start-sub {
+    font-size:
+      7px;
+
+    letter-spacing:
+      3px;
+  }
+
+
+  .countdown-caption {
+    bottom:
+      70px;
+
+    font-size:
+      9px;
+  }
+
+
+  .wish-result {
+    padding:
+      35px 24px;
+  }
+
+
+  .wish-result h2 {
+    font-size:
+      23px;
+
+    letter-spacing:
+      3px;
+  }
+
+}
+
+
+/* =========================================================
+   第二颗星愿：黄色星星奖励动画
+   与第一关红色星星完全相同的动画节奏
+========================================================= */
+
+.wish-reward-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(150, 105, 8, 0.30),
+      rgba(5, 3, 15, 0.96) 70%
+    );
+  animation: rewardBackgroundIn .7s ease both;
+}
+
+.wish-reward-particle-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wish-reward-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: calc(8px + var(--i) * .45px);
+  color: rgba(255,255,255,.9);
+  text-shadow:
+    0 0 8px white,
+    0 0 18px rgba(255,220,70,.9);
+  opacity: 0;
+  animation: rewardParticle 2.8s ease-out infinite;
+  animation-delay: calc(var(--i) * -0.09s);
+}
+
+.wish-reward-particle:nth-child(3n) {
+  color: rgba(255,215,60,.95);
+}
+
+.wish-reward-particle:nth-child(3n + 1) {
+  color: rgba(255,255,255,.95);
+}
+
+.wish-reward-particle:nth-child(3n + 2) {
+  color: rgba(255,240,150,.95);
+}
+
+.wish-reward-rings {
+  position: absolute;
+  width: 430px;
+  height: 430px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wish-reward-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(255,215,70,.18);
+  box-shadow:
+    0 0 25px rgba(255,205,40,.12),
+    inset 0 0 25px rgba(255,205,40,.08);
+  transform: scale(.2);
+  opacity: 0;
+}
+
+.wish-ring-one { animation: rewardRingOne 2.8s ease-out both; }
+.wish-ring-two { animation: rewardRingTwo 2.8s ease-out both; }
+.wish-ring-three { animation: rewardRingThree 2.8s ease-out both; }
+
+.wish-reward-yellow-star {
+  position: relative;
+  z-index: 10;
+  width: 170px;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(.1);
+  opacity: 0;
+}
+
+.wish-reward-appear .wish-reward-yellow-star {
+  animation: redStarAppear 1s cubic-bezier(.16,1,.3,1) both;
+}
+
+.wish-reward-glow .wish-reward-yellow-star {
+  animation: redStarGlow 1.8s ease-in-out both;
+}
+
+.wish-reward-burst .wish-reward-yellow-star {
+  animation: redStarBurst 1.2s cubic-bezier(.16,1,.3,1) both;
+}
+
+.wish-reward-star-halo {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,220,60,.55),
+      rgba(255,195,20,.22) 35%,
+      transparent 72%
+    );
+  filter: blur(10px);
+}
+
+.wish-reward-star-core {
+  position: relative;
+  z-index: 3;
+  font-size: 145px;
+  line-height: 1;
+  color: #ffd84d;
+  text-shadow:
+    0 0 8px #fff,
+    0 0 18px #fff0a0,
+    0 0 35px #ffd43d,
+    0 0 65px #ffc928,
+    0 0 100px rgba(255,205,30,.9),
+    0 0 150px rgba(255,190,20,.65);
+}
+
+.wish-reward-star-shine {
+  position: absolute;
+  z-index: 5;
+  top: 6px;
+  right: 10px;
+  font-size: 34px;
+  color: white;
+  text-shadow:
+    0 0 10px white,
+    0 0 25px #fff0a8;
+  animation: rewardShine 1.4s ease-in-out infinite;
+}
+
+.wish-reward-star-rays {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      rgba(255,215,55,.25),
+      transparent 10%,
+      transparent 20%,
+      rgba(255,225,90,.18),
+      transparent 30%,
+      transparent 45%,
+      rgba(255,210,50,.22),
+      transparent 55%,
+      transparent 70%,
+      rgba(255,230,100,.2),
+      transparent 80%,
+      transparent
+    );
+  filter: blur(4px);
+  animation: rayRotate 5s linear infinite;
+}
+
+.wish-reward-text {
+  position: absolute;
+  z-index: 20;
+  top: calc(50% + 125px);
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.wish-reward-glow .wish-reward-text {
+  animation: rewardTextIn .8s .25s ease-out both;
+}
+
+.wish-reward-burst .wish-reward-text {
+  animation: rewardTextFinal .8s ease-out both;
+}
+
+.wish-reward-small-text {
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: rgba(255,225,125,.7);
+  margin-bottom: 10px;
+}
+
+.wish-reward-text h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 5px;
+  color: white;
+  text-shadow:
+    0 0 10px white,
+    0 0 25px #ffd84d,
+    0 0 45px rgba(255,205,50,.8);
+}
+
+.wish-reward-text p {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(255,255,255,.62);
+}
+
+.wish-reward-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255,255,255,1),
+      rgba(255,235,145,.85) 18%,
+      rgba(255,205,45,.25) 40%,
+      transparent 70%
+    );
+  opacity: 0;
+}
+
+.wish-reward-burst .wish-reward-flash {
+  animation: rewardFlash 1.2s 2s ease-out both;
+}
+
+
+/* Shared transition keyframes — identical timing to Chapter 1 */
+@keyframes rewardBackgroundIn {
+  from { opacity: 0; transform: scale(1.08); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rewardParticle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(.3);
+  }
+  20% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform:
+      translate(
+        calc(-50% + (var(--i) - 14) * 34px),
+        calc(-50% + (var(--i) - 14) * 24px)
+      )
+      rotate(180deg)
+      scale(1.3);
+  }
+}
+
+@keyframes rewardRingOne {
+  0% { opacity: 0; transform: scale(.2); }
+  35% { opacity: .8; }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+
+@keyframes rewardRingTwo {
+  0% { opacity: 0; transform: scale(.1); }
+  45% { opacity: .6; }
+  100% { opacity: 0; transform: scale(1.55); }
+}
+
+@keyframes rewardRingThree {
+  0% { opacity: 0; transform: scale(.05); }
+  55% { opacity: .45; }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+@keyframes redStarAppear {
+  0% { opacity: 0; transform: scale(.05) rotate(-25deg); }
+  45% { opacity: 1; transform: scale(1.18) rotate(8deg); }
+  70% { transform: scale(.94) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes redStarGlow {
+  0% { opacity: 1; transform: scale(1); }
+  50% { transform: scale(1.13); }
+  100% { opacity: 1; transform: scale(1.06); }
+}
+
+@keyframes redStarBurst {
+  0% { opacity: 1; transform: scale(1.06); }
+  45% { transform: scale(1.28); }
+  100% { opacity: .92; transform: scale(1.12); }
+}
+
+@keyframes rewardShine {
+  0%, 100% { transform: scale(.8) rotate(0deg); opacity: .65; }
+  50% { transform: scale(1.35) rotate(20deg); opacity: 1; }
+}
+
+@keyframes rayRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rewardTextIn {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rewardTextFinal {
+  from { opacity: 0; transform: translateY(15px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes rewardFlash {
+  0% { opacity: 0; transform: scale(.5); }
+  35% { opacity: .9; }
+  100% { opacity: 0; transform: scale(1.8); }
+}

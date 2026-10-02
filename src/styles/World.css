@@ -1,0 +1,992 @@
+.world-screen {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #34458a,
+            #050816 70%
+        );
+
+    color: white;
+
+    overflow: hidden;
+
+    padding: 40px 20px;
+
+    box-sizing: border-box;
+}
+
+
+.world-container {
+
+    width: 600px;
+
+    max-width: 100%;
+
+    text-align: center;
+
+    animation: appear 1s ease;
+
+    position: relative;
+
+    z-index: 2;
+
+}
+
+
+/* =========================================
+   顶部标签
+   ========================================= */
+
+.world-tag {
+
+    color: #7dd3fc;
+
+    letter-spacing: 6px;
+
+    font-size: 14px;
+
+    margin-bottom: 25px;
+
+}
+
+
+/* =========================================
+   标题
+   ========================================= */
+
+.world-container h1 {
+
+    font-size: 60px;
+
+    letter-spacing: 12px;
+
+    color: #9bb3ff;
+
+    text-shadow:
+        0 0 20px #8da2ff,
+        0 0 50px #6c63ff;
+
+    margin: 0;
+
+}
+
+
+/* =========================================
+   描述
+   ========================================= */
+
+.world-description {
+
+    margin-top: 25px;
+
+    line-height: 2;
+
+    font-size: 20px;
+
+    opacity: .85;
+
+}
+
+
+/* =========================================
+   三颗星星
+   ========================================= */
+
+.world-stars {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    gap: 55px;
+
+    margin-top: 30px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.world-star-item {
+
+    width: 100px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.world-star-item span {
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+    opacity: .75;
+
+}
+
+
+/* =========================================
+   星星本体
+   ========================================= */
+
+.world-star {
+
+    width: 64px;
+
+    height: 64px;
+
+    position: relative;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+
+/* 星星 */
+
+.star-core {
+
+    position: relative;
+
+    z-index: 3;
+
+    font-size: 55px;
+
+    line-height: 1;
+
+    transition: .5s;
+
+}
+
+
+/* =========================================
+   未获得
+   ========================================= */
+
+.star-locked .world-star {
+
+    opacity: .2;
+
+    filter:
+        grayscale(1)
+        brightness(.45);
+
+}
+
+
+.star-locked .star-core {
+
+    text-shadow:
+        0 0 3px rgba(255,255,255,.15);
+
+}
+
+
+/* =========================================
+   已获得
+   ========================================= */
+
+.star-obtained .world-star {
+
+    animation:
+        starFloat 3s ease-in-out infinite;
+
+}
+
+
+.star-obtained .star-core {
+
+    animation:
+        starPulse 1.8s ease-in-out infinite;
+
+}
+
+
+/* =========================================
+   红星
+   ========================================= */
+
+.world-star.red .star-core {
+
+    color: #ff5d73;
+
+    text-shadow:
+        0 0 8px #ff334f,
+        0 0 20px #ff334f,
+        0 0 45px #ff334f,
+        0 0 80px rgba(255,50,80,.8);
+
+}
+
+
+/* =========================================
+   黄星
+   ========================================= */
+
+.world-star.yellow .star-core {
+
+    color: #ffe66d;
+
+    text-shadow:
+        0 0 8px #ffe45c,
+        0 0 20px #ffd83d,
+        0 0 45px #ffd83d,
+        0 0 80px rgba(255,220,50,.8);
+
+}
+
+
+/* =========================================
+   蓝星
+   ========================================= */
+
+.world-star.blue .star-core {
+
+    color: #65d9ff;
+
+    text-shadow:
+        0 0 8px #48d8ff,
+        0 0 20px #42cfff,
+        0 0 45px #42cfff,
+        0 0 80px rgba(50,200,255,.8);
+
+}
+
+
+/* =========================================
+   星星外围光晕
+   ========================================= */
+
+.star-glow {
+
+    position: absolute;
+
+    width: 60px;
+
+    height: 60px;
+
+    border-radius: 50%;
+
+    filter: blur(15px);
+
+    opacity: .75;
+
+    animation:
+        glowPulse 1.8s ease-in-out infinite;
+
+}
+
+
+/* 红色光 */
+
+.red-star .star-glow {
+
+    background:
+        rgba(255,55,80,.75);
+
+}
+
+
+/* 黄色光 */
+
+.yellow-star .star-glow {
+
+    background:
+        rgba(255,220,55,.75);
+
+}
+
+
+/* 蓝色光 */
+
+.blue-star .star-glow {
+
+    background:
+        rgba(60,210,255,.75);
+
+}
+
+
+/* =========================================
+   任务卡
+   ========================================= */
+
+.mission-card {
+
+    margin-top: 25px;
+
+    padding: 30px 35px;
+
+    border-radius: 25px;
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        1px solid rgba(255,255,255,.25);
+
+    backdrop-filter:
+        blur(15px);
+
+    box-shadow:
+        0 0 40px rgba(120,150,255,.25);
+
+}
+
+
+.mission-card h2 {
+
+    letter-spacing: 8px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.mission-list p {
+
+    margin: 12px;
+
+    font-size: 18px;
+
+}
+
+
+/* =========================================
+   当前任务状态
+   ========================================= */
+
+.mission-status {
+
+    margin:
+        20px auto 0;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 14px;
+
+    color: #cdd8ff;
+
+}
+
+
+.mission-status-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #7dd3fc;
+
+    box-shadow:
+        0 0 8px #7dd3fc,
+        0 0 16px #7dd3fc;
+
+    animation:
+        statusPulse 1.5s infinite;
+
+}
+
+
+/* =========================================
+   进度
+   ========================================= */
+
+.progress-area {
+
+    margin-top: 25px;
+
+}
+
+
+.progress-area p {
+
+    margin-bottom: 10px;
+
+}
+
+
+.progress-bar {
+
+    width: 320px;
+
+    height: 10px;
+
+    margin: 15px auto;
+
+    background:
+        rgba(255,255,255,.15);
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+}
+
+
+.progress-fill {
+
+    height: 100%;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6c63ff,
+            #7dd3fc
+        );
+
+    box-shadow:
+        0 0 12px #7dd3fc,
+        0 0 25px rgba(125,211,252,.7);
+
+    transition:
+        width 1.2s cubic-bezier(.22,1,.36,1);
+
+}
+
+
+/* =========================================
+   星愿数量
+   ========================================= */
+
+.star-progress {
+
+    margin-top: 18px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: baseline;
+
+    gap: 5px;
+
+    color: rgba(255,255,255,.65);
+
+    font-size: 14px;
+
+}
+
+
+.star-progress strong {
+
+    font-size: 24px;
+
+    color: #fff;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.8);
+
+}
+
+
+/* =========================================
+   按钮
+   ========================================= */
+
+.world-buttons {
+
+    margin-top: 30px;
+
+}
+
+
+.enter-btn {
+
+    margin-top: 20px;
+
+    padding: 15px 55px;
+
+    border: none;
+
+    border-radius: 50px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6c63ff,
+            #7dd3fc
+        );
+
+    color: white;
+
+    font-size: 20px;
+
+    letter-spacing: 5px;
+
+    cursor: pointer;
+
+    transition: .3s;
+
+    box-shadow:
+        0 0 25px rgba(108,99,255,.7);
+
+}
+
+
+.enter-btn:hover {
+
+    transform: scale(1.08);
+
+    box-shadow:
+        0 0 45px #8da2ff;
+
+}
+
+
+/* =========================================
+   三星完成区域
+   ========================================= */
+
+.world-completed {
+
+    animation:
+        completedAppear 1.2s ease;
+
+}
+
+
+.world-final-area {
+
+    margin-top: 25px;
+
+}
+
+
+.final-star-message {
+
+    position: relative;
+
+}
+
+
+.final-star-message h3 {
+
+    margin-top: 5px;
+
+    font-size: 23px;
+
+    letter-spacing: 4px;
+
+    color: white;
+
+    text-shadow:
+        0 0 15px rgba(255,255,255,.8),
+        0 0 30px rgba(130,150,255,.8);
+
+}
+
+
+.final-star-message p {
+
+    margin-top: 8px;
+
+    color: #b9c8ff;
+
+    font-size: 15px;
+
+    animation:
+        finalHintPulse 1.8s ease-in-out infinite;
+
+}
+
+
+/* =========================================
+   三星旋转
+   ========================================= */
+
+.final-star-orbit {
+
+    width: 115px;
+
+    height: 115px;
+
+    margin:
+        0 auto 5px;
+
+    position: relative;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    animation:
+        orbitRotate 5s linear infinite;
+
+}
+
+
+.orbit-star {
+
+    position: absolute;
+
+    font-size: 30px;
+
+    line-height: 1;
+
+}
+
+
+.orbit-red {
+
+    color: #ff5d73;
+
+    top: 5px;
+
+    left: 43px;
+
+    text-shadow:
+        0 0 10px #ff334f,
+        0 0 25px #ff334f;
+
+}
+
+
+.orbit-yellow {
+
+    color: #ffe66d;
+
+    bottom: 8px;
+
+    left: 8px;
+
+    text-shadow:
+        0 0 10px #ffe45c,
+        0 0 25px #ffd83d;
+
+}
+
+
+.orbit-blue {
+
+    color: #65d9ff;
+
+    bottom: 8px;
+
+    right: 8px;
+
+    text-shadow:
+        0 0 10px #48d8ff,
+        0 0 25px #42cfff;
+
+}
+
+
+.orbit-core {
+
+    width: 34px;
+
+    height: 34px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-size: 25px;
+
+    color: white;
+
+    text-shadow:
+        0 0 10px white,
+        0 0 25px #9bb3ff,
+        0 0 45px #6c63ff;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.9),
+            rgba(130,150,255,.25),
+            transparent 70%
+        );
+
+    box-shadow:
+        0 0 20px rgba(150,170,255,.8),
+        0 0 50px rgba(100,120,255,.6);
+
+    animation:
+        corePulse 1.3s ease-in-out infinite;
+
+}
+
+
+/* =========================================
+   最终按钮
+   ========================================= */
+
+.final-enter-btn {
+
+    margin-top: 5px;
+
+    animation:
+        finalButtonAppear .8s ease;
+
+}
+
+
+/* =========================================
+   动画
+   ========================================= */
+
+@keyframes appear {
+
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+@keyframes starFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-7px);
+    }
+
+}
+
+
+@keyframes starPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
+
+}
+
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        transform: scale(.8);
+        opacity: .45;
+    }
+
+    50% {
+        transform: scale(1.25);
+        opacity: .9;
+    }
+
+}
+
+
+@keyframes statusPulse {
+
+    0%,
+    100% {
+        opacity: .5;
+        transform: scale(.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+}
+
+
+@keyframes orbitRotate {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+@keyframes corePulse {
+
+    0%,
+    100% {
+        transform: scale(.85);
+        opacity: .75;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes completedAppear {
+
+    from {
+        opacity: .4;
+        transform: scale(.96);
+        filter: brightness(.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+}
+
+
+@keyframes finalHintPulse {
+
+    0%,
+    100% {
+        opacity: .55;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes finalButtonAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* =========================================
+   手机
+   ========================================= */
+
+@media (max-width: 700px) {
+
+    .world-container h1 {
+
+        font-size: 38px;
+
+        letter-spacing: 6px;
+
+    }
+
+
+    .world-description {
+
+        font-size: 16px;
+
+    }
+
+
+    .world-stars {
+
+        gap: 20px;
+
+    }
+
+
+    .world-star-item {
+
+        width: 85px;
+
+    }
+
+
+    .world-star {
+
+        width: 55px;
+
+        height: 55px;
+
+    }
+
+
+    .star-core {
+
+        font-size: 46px;
+
+    }
+
+
+    .mission-card {
+
+        padding: 25px 18px;
+
+    }
+
+
+    .progress-bar {
+
+        width: 260px;
+
+    }
+
+
+    .enter-btn {
+
+        padding:
+            13px 35px;
+
+        font-size: 17px;
+
+    }
+
+}

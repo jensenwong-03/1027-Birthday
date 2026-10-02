@@ -1,0 +1,405 @@
+/* =========================================
+   CHAPTER 3 INTRO
+   ========================================= */
+
+.chapter3-intro-page {
+
+  position: fixed;
+
+  inset: 0;
+
+  overflow: hidden;
+
+  background:
+    #050816;
+
+  color: white;
+
+  font-family:
+    "Noto Sans SC",
+    "Microsoft YaHei",
+    sans-serif;
+
+}
+
+
+/* =========================================
+   SCREEN
+   ========================================= */
+
+.chapter3-intro-screen {
+
+  position: relative;
+
+  z-index: 5;
+
+  width: 100%;
+
+  height: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+}
+
+
+/* =========================================
+   CHAPTER NUMBER
+   ========================================= */
+
+.chapter3-intro-number {
+
+  margin: 0 0 18px;
+
+  font-size: 13px;
+
+  letter-spacing: 6px;
+
+  color:
+    rgba(
+      190,
+      220,
+      255,
+      0.7
+    );
+
+  animation:
+    chapter3IntroFadeIn
+    1.2s ease
+    forwards;
+
+}
+
+
+/* =========================================
+   TITLE
+   ========================================= */
+
+.chapter3-intro-screen h1 {
+
+  margin: 0;
+
+  font-size: 52px;
+
+  font-weight: 500;
+
+  letter-spacing: 12px;
+
+  text-indent: 12px;
+
+  color:
+    #ffffff;
+
+  text-shadow:
+    0 0 18px
+    rgba(
+      130,
+      210,
+      255,
+      0.45
+    );
+
+  animation:
+    chapter3TitleIn
+    1.5s ease
+    forwards;
+
+}
+
+
+/* =========================================
+   LINE
+   ========================================= */
+
+.chapter3-intro-line {
+
+  width: 120px;
+
+  height: 1px;
+
+  margin-top: 26px;
+
+  background:
+    rgba(
+      180,
+      225,
+      255,
+      0.55
+    );
+
+  box-shadow:
+    0 0 12px
+    rgba(
+      120,
+      210,
+      255,
+      0.45
+    );
+
+}
+
+
+/* =========================================
+   STORY
+   ========================================= */
+
+.chapter3-intro-story {
+
+  min-height: 150px;
+
+  margin-top: 34px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: flex-start;
+
+  align-items: center;
+
+}
+
+
+/* =========================================
+   STORY LINE
+   ========================================= */
+
+.chapter3-intro-story-line {
+
+  margin: 7px 0;
+
+  font-size: 16px;
+
+  font-weight: 300;
+
+  letter-spacing: 2px;
+
+  color:
+    rgba(
+      240,
+      247,
+      255,
+      0.86
+    );
+
+  opacity: 0;
+
+  animation:
+    chapter3StoryIn
+    1.1s
+    ease
+    forwards;
+
+}
+
+
+/* =========================================
+   BUTTON
+   ========================================= */
+
+.chapter3-start-btn {
+
+  margin-top: 26px;
+
+  padding:
+    13px 42px;
+
+  border:
+    1px solid
+    rgba(
+      170,
+      225,
+      255,
+      0.55
+    );
+
+  border-radius: 4px;
+
+  background:
+    rgba(
+      80,
+      140,
+      180,
+      0.08
+    );
+
+  color:
+    rgba(
+      235,
+      250,
+      255,
+      0.95
+    );
+
+  font-family:
+    inherit;
+
+  font-size: 14px;
+
+  letter-spacing: 4px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 20px
+    rgba(
+      80,
+      190,
+      255,
+      0.08
+    );
+
+  opacity: 0;
+
+  animation:
+    chapter3ButtonIn
+    1.2s
+    ease
+    forwards;
+
+  transition:
+    all
+    0.35s
+    ease;
+
+}
+
+
+.chapter3-start-btn:hover {
+
+  background:
+    rgba(
+      100,
+      190,
+      235,
+      0.16
+    );
+
+  border-color:
+    rgba(
+      190,
+      240,
+      255,
+      0.9
+    );
+
+  box-shadow:
+    0 0 28px
+    rgba(
+      90,
+      210,
+      255,
+      0.22
+    );
+
+  transform:
+    translateY(-2px);
+
+}
+
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+@keyframes chapter3IntroFadeIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+@keyframes chapter3TitleIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(18px);
+
+    letter-spacing: 20px;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+    letter-spacing: 12px;
+
+  }
+
+}
+
+
+@keyframes chapter3StoryIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+@keyframes chapter3ButtonIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(12px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}

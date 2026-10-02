@@ -1,0 +1,1867 @@
+/* =========================================
+   CHAPTER 02 — 星愿许愿瓶
+   ========================================= */
+
+.chapter2-page {
+
+  position: fixed;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  background: #050816;
+
+  color: #ffffff;
+
+  font-family:
+    "Noto Sans SC",
+    "Microsoft YaHei",
+    sans-serif;
+
+  isolation: isolate;
+
+}
+
+
+/* =========================================
+   Chapter Story Screen
+   ========================================= */
+
+.chapter2-screen {
+
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: 100;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================================
+   Story Container
+   ========================================= */
+
+.chapter2-intro {
+
+  position: relative;
+
+  width: min(650px, 82vw);
+
+  margin: 0 auto;
+
+  text-align: center;
+
+  pointer-events: auto;
+
+  opacity: 0;
+
+  animation:
+    chapter2Appear
+    1.2s ease forwards;
+
+}
+
+
+/* =========================================
+   Intro Appear
+   ========================================= */
+
+@keyframes chapter2Appear {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(18px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+/* =========================================
+   Chapter Number
+   ========================================= */
+
+.chapter2-intro .chapter-number {
+
+  display: block;
+
+  width: 100%;
+
+  margin:
+    0 0 18px 0;
+
+  padding: 0;
+
+  text-align: center;
+
+  font-size: 11px;
+
+  font-weight: 400;
+
+  line-height: 1.5;
+
+  letter-spacing: 5px;
+
+  color:
+    rgba(255,255,255,0.42);
+
+  text-shadow:
+    0 0 12px
+    rgba(255,255,255,0.18);
+
+}
+
+
+/* =========================================
+   Title
+   ========================================= */
+
+.chapter2-intro h1 {
+
+  display: block;
+
+  width: 100%;
+
+  margin: 0;
+
+  padding: 0;
+
+  text-align: center;
+
+  font-size: 38px;
+
+  font-weight: 400;
+
+  line-height: 1.4;
+
+  letter-spacing: 8px;
+
+  color: #ffffff;
+
+  text-shadow:
+
+    0 0 18px
+    rgba(255,255,255,0.25),
+
+    0 0 35px
+    rgba(150,200,255,0.08);
+
+}
+
+
+/* =========================================
+   Divider
+   ========================================= */
+
+.chapter-line {
+
+  width: 80px;
+
+  height: 1px;
+
+  margin:
+    25px auto 30px;
+
+  background:
+
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.55),
+      transparent
+    );
+
+  box-shadow:
+
+    0 0 10px
+    rgba(180,220,255,0.25);
+
+}
+
+
+/* =========================================
+   Story Container
+   ========================================= */
+
+.chapter-story {
+
+  width: 100%;
+
+  min-height: 125px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  text-align: center;
+
+}
+
+
+/* =========================================
+   Story Text
+   ========================================= */
+
+.chapter2-story-line {
+
+  display: block;
+
+  width: 100%;
+
+  margin: 0;
+
+  padding: 0;
+
+  text-align: center;
+
+  font-size: 15px;
+
+  font-weight: 400;
+
+  line-height: 1.9;
+
+  letter-spacing: 3px;
+
+  color:
+    rgba(255,255,255,0.76);
+
+  text-shadow:
+
+    0 0 12px
+    rgba(255,255,255,0.18);
+
+  animation:
+    storyLineAppear
+    0.8s ease forwards;
+
+}
+
+
+@keyframes storyLineAppear {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(8px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+/* =========================================
+   Start Button
+   ========================================= */
+
+.start-chapter2-btn {
+
+  position: relative;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 13px;
+
+  margin:
+    30px auto 0;
+
+  padding:
+    12px 26px;
+
+  border:
+    1px solid
+    rgba(255,255,255,0.42);
+
+  border-radius: 30px;
+
+  outline: none;
+
+  background:
+
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.075),
+      rgba(120,180,255,.035)
+    );
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 400;
+
+  line-height: 1.5;
+
+  letter-spacing: 3px;
+
+  text-align: center;
+
+  cursor: pointer;
+
+  box-shadow:
+
+    0 0 18px
+    rgba(150,200,255,0.08),
+
+    inset 0 0 20px
+    rgba(160,220,255,.025);
+
+  overflow: hidden;
+
+  transition:
+    all 0.35s ease;
+
+}
+
+
+.start-chapter2-btn::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+
+    linear-gradient(
+      110deg,
+      transparent 20%,
+      rgba(255,255,255,.16) 50%,
+      transparent 80%
+    );
+
+  transform:
+    translateX(-120%);
+
+  transition:
+    transform .7s ease;
+
+}
+
+
+.start-chapter2-btn:hover::before {
+
+  transform:
+    translateX(120%);
+
+}
+
+
+.start-chapter2-btn:hover {
+
+  border-color:
+    rgba(255,255,255,.8);
+
+  box-shadow:
+
+    0 0 30px
+    rgba(150,210,255,.16),
+
+    inset 0 0 25px
+    rgba(150,210,255,.04);
+
+  transform:
+    translateY(-3px);
+
+}
+
+
+.start-btn-star {
+
+  color: #dff8ff;
+
+  font-size: 15px;
+
+  text-shadow:
+    0 0 15px
+    rgba(140,225,255,.9);
+
+}
+
+
+.start-btn-arrow {
+
+  opacity: .5;
+
+  transition:
+    transform .3s ease,
+    opacity .3s ease;
+
+}
+
+
+.start-chapter2-btn:hover .start-btn-arrow {
+
+  transform:
+    translateX(4px);
+
+  opacity: 1;
+
+}
+
+
+/* =========================================
+   CONFIRMATION OVERLAY
+   ========================================= */
+
+.chapter2-confirm-overlay {
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 500;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(75,130,200,.08),
+      transparent 40%
+    ),
+
+    rgba(2,5,15,.62);
+
+  backdrop-filter:
+    blur(14px);
+
+  animation:
+    confirmOverlayIn
+    .65s ease both;
+
+}
+
+
+@keyframes confirmOverlayIn {
+
+  from {
+
+    opacity: 0;
+
+    backdrop-filter:
+      blur(0);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    backdrop-filter:
+      blur(14px);
+
+  }
+
+}
+
+
+/* =========================================
+   Confirm Background Glow
+   ========================================= */
+
+.confirm-bg-glow {
+
+  position: absolute;
+
+  width: 360px;
+  height: 360px;
+
+  border-radius: 50%;
+
+  background:
+
+    radial-gradient(
+      circle,
+      rgba(130,220,255,.13),
+      rgba(90,120,255,.04) 35%,
+      transparent 70%
+    );
+
+  filter:
+    blur(25px);
+
+  animation:
+    confirmGlow 3s ease-in-out infinite;
+
+}
+
+
+@keyframes confirmGlow {
+
+  0%, 100% {
+
+    transform:
+      scale(.9);
+
+    opacity: .6;
+
+  }
+
+  50% {
+
+    transform:
+      scale(1.15);
+
+    opacity: 1;
+
+  }
+
+}
+
+
+/* =========================================
+   Floating Stars
+   ========================================= */
+
+.confirm-star {
+
+  position: absolute;
+
+  color: white;
+
+  font-size: 14px;
+
+  opacity: 0;
+
+  text-shadow:
+    0 0 18px
+    rgba(140,225,255,.9);
+
+}
+
+
+.confirm-star-a {
+
+  left: 20%;
+  top: 25%;
+
+  animation:
+    confirmStarFloat 3.5s 0s infinite;
+
+}
+
+
+.confirm-star-b {
+
+  right: 19%;
+  top: 31%;
+
+  animation:
+    confirmStarFloat 4s .5s infinite;
+
+}
+
+
+.confirm-star-c {
+
+  left: 26%;
+  bottom: 24%;
+
+  animation:
+    confirmStarFloat 4.5s 1s infinite;
+
+}
+
+
+.confirm-star-d {
+
+  right: 25%;
+  bottom: 21%;
+
+  animation:
+    confirmStarFloat 3.8s 1.3s infinite;
+
+}
+
+
+@keyframes confirmStarFloat {
+
+  0% {
+
+    opacity: 0;
+
+    transform:
+      translateY(15px)
+      scale(.5);
+
+  }
+
+  25% {
+
+    opacity: .65;
+
+  }
+
+  50% {
+
+    opacity: 1;
+
+    transform:
+      translateY(-8px)
+      scale(1);
+
+  }
+
+  75% {
+
+    opacity: .45;
+
+  }
+
+  100% {
+
+    opacity: 0;
+
+    transform:
+      translateY(-20px)
+      scale(.6);
+
+  }
+
+}
+
+
+/* =========================================
+   Confirmation Panel
+   ========================================= */
+
+.chapter2-confirm-panel {
+
+  position: relative;
+
+  width: min(450px, 88vw);
+
+  padding:
+    42px 42px 32px;
+
+  border:
+    1px solid
+    rgba(200,235,255,.17);
+
+  background:
+
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.055),
+      rgba(255,255,255,.012)
+    ),
+
+    rgba(5,12,29,.76);
+
+  backdrop-filter:
+    blur(20px);
+
+  box-shadow:
+
+    0 30px 100px
+    rgba(0,0,0,.5),
+
+    inset 0 0 70px
+    rgba(110,190,255,.025);
+
+  text-align: center;
+
+  animation:
+    confirmPanelIn
+    .75s cubic-bezier(.18,.8,.2,1)
+    both;
+
+}
+
+
+@keyframes confirmPanelIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(30px)
+      scale(.94);
+
+    filter:
+      blur(8px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+    filter:
+      blur(0);
+
+  }
+
+}
+
+
+/* =========================================
+   Panel Decorative Lines
+   ========================================= */
+
+.chapter2-confirm-panel::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: 80px;
+  height: 1px;
+
+  transform:
+    translateX(-50%);
+
+  background:
+
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(210,245,255,.8),
+      transparent
+    );
+
+  box-shadow:
+    0 0 12px
+    rgba(150,225,255,.5);
+
+}
+
+
+.chapter2-confirm-panel::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 9px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.025);
+
+  pointer-events: none;
+
+}
+
+
+/* =========================================
+   Confirm Typography
+   ========================================= */
+
+.confirm-top-line {
+
+  font-size: 8px;
+
+  letter-spacing: .35em;
+
+  color:
+    rgba(225,245,255,.38);
+
+}
+
+
+.confirm-symbol {
+
+  margin:
+    20px 0 10px;
+
+  font-size: 27px;
+
+  color:
+    #e3f9ff;
+
+  text-shadow:
+
+    0 0 10px
+    rgba(255,255,255,.8),
+
+    0 0 30px
+    rgba(100,220,255,.7);
+
+  animation:
+    confirmSymbolPulse
+    2s ease-in-out infinite;
+
+}
+
+
+@keyframes confirmSymbolPulse {
+
+  0%, 100% {
+
+    transform:
+      scale(.9);
+
+  }
+
+  50% {
+
+    transform:
+      scale(1.15);
+
+  }
+
+}
+
+
+.chapter2-confirm-panel h2 {
+
+  margin: 0;
+
+  font-size: 28px;
+
+  font-weight: 400;
+
+  letter-spacing: .18em;
+
+}
+
+
+.confirm-divider {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  margin:
+    19px 0 22px;
+
+}
+
+
+.confirm-divider span {
+
+  width: 45px;
+
+  height: 1px;
+
+  background:
+
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(210,240,255,.35)
+    );
+
+}
+
+
+.confirm-divider span:last-child {
+
+  transform:
+    scaleX(-1);
+
+}
+
+
+.confirm-divider i {
+
+  font-style: normal;
+
+  font-size: 8px;
+
+  opacity: .6;
+
+}
+
+
+.confirm-main-text {
+
+  margin: 0;
+
+  color:
+    rgba(240,248,255,.82);
+
+  font-size: 14px;
+
+  letter-spacing: .1em;
+
+}
+
+
+.confirm-sub-text {
+
+  margin:
+    12px 0 0;
+
+  color:
+    rgba(220,239,250,.48);
+
+  font-size: 11px;
+
+  line-height: 1.9;
+
+  letter-spacing: .05em;
+
+}
+
+
+/* =========================================
+   Control Hint
+   ========================================= */
+
+.confirm-control {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 13px;
+
+  margin:
+    25px auto 26px;
+
+  padding:
+    10px 17px;
+
+  width: fit-content;
+
+  border:
+    1px solid
+    rgba(190,230,255,.08);
+
+  background:
+    rgba(255,255,255,.025);
+
+}
+
+
+.control-icon {
+
+  color:
+    rgba(220,245,255,.6);
+
+  font-size: 15px;
+
+}
+
+
+.confirm-control span {
+
+  font-size: 10px;
+
+  letter-spacing: .15em;
+
+  color:
+    rgba(225,242,255,.48);
+
+}
+
+
+/* =========================================
+   Confirm Actions
+   ========================================= */
+
+.confirm-actions {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 12px;
+
+}
+
+
+.confirm-actions button {
+
+  height: 42px;
+
+  padding:
+    0 23px;
+
+  border-radius: 2px;
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  letter-spacing: .14em;
+
+  cursor: pointer;
+
+  transition:
+    all .35s ease;
+
+}
+
+
+.confirm-cancel {
+
+  border:
+    1px solid
+    rgba(255,255,255,.12);
+
+  background:
+    rgba(255,255,255,.025);
+
+  color:
+    rgba(230,242,250,.45);
+
+}
+
+
+.confirm-cancel:hover {
+
+  border-color:
+    rgba(255,255,255,.3);
+
+  color:
+    rgba(255,255,255,.8);
+
+}
+
+
+.confirm-start {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  border:
+    1px solid
+    rgba(200,240,255,.4);
+
+  background:
+
+    linear-gradient(
+      135deg,
+      rgba(170,225,255,.09),
+      rgba(100,120,255,.07)
+    );
+
+  color:
+    white;
+
+  box-shadow:
+    0 0 20px
+    rgba(120,200,255,.07);
+
+}
+
+
+.confirm-start:hover {
+
+  border-color:
+    rgba(215,247,255,.8);
+
+  background:
+
+    linear-gradient(
+      135deg,
+      rgba(170,225,255,.15),
+      rgba(100,120,255,.11)
+    );
+
+  box-shadow:
+    0 0 30px
+    rgba(120,210,255,.15);
+
+  transform:
+    translateY(-2px);
+
+}
+
+
+.confirm-arrow {
+
+  opacity: .55;
+
+  transition:
+    transform .3s ease;
+
+}
+
+
+.confirm-start:hover .confirm-arrow {
+
+  transform:
+    translateX(4px);
+
+}
+
+
+.confirm-footer {
+
+  margin-top: 25px;
+
+  font-size: 7px;
+
+  letter-spacing: .35em;
+
+  color:
+    rgba(220,240,255,.2);
+
+}
+
+
+/* =========================================
+   COUNTDOWN
+   ========================================= */
+
+.chapter2-countdown {
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 900;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-direction: column;
+
+  background:
+
+    radial-gradient(
+      circle at center,
+      rgba(70,130,210,.12),
+      rgba(2,5,15,.92) 48%,
+      #01030b 100%
+    );
+
+  animation:
+    countdownBackgroundIn
+    .35s ease both;
+
+}
+
+
+@keyframes countdownBackgroundIn {
+
+  from {
+
+    opacity: 0;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+  }
+
+}
+
+
+/* =========================================
+   Countdown Glow
+   ========================================= */
+
+.countdown-glow {
+
+  position: absolute;
+
+  width: 280px;
+  height: 280px;
+
+  border-radius: 50%;
+
+  background:
+
+    radial-gradient(
+      circle,
+      rgba(180,235,255,.2),
+      rgba(90,140,255,.08) 35%,
+      transparent 70%
+    );
+
+  filter:
+    blur(18px);
+
+  animation:
+    countdownGlow
+    1s ease-in-out infinite;
+
+}
+
+
+@keyframes countdownGlow {
+
+  0%, 100% {
+
+    transform:
+      scale(.65);
+
+    opacity: .45;
+
+  }
+
+  50% {
+
+    transform:
+      scale(1.15);
+
+    opacity: 1;
+
+  }
+
+}
+
+
+/* =========================================
+   Countdown Rings
+   ========================================= */
+
+.countdown-ring {
+
+  position: absolute;
+
+  width: 170px;
+  height: 170px;
+
+  border-radius: 50%;
+
+  border:
+    1px solid
+    rgba(180,230,255,.2);
+
+  pointer-events: none;
+
+}
+
+
+.countdown-ring-a {
+
+  animation:
+    countdownRingA
+    3s linear infinite;
+
+}
+
+
+.countdown-ring-b {
+
+  width: 230px;
+  height: 230px;
+
+  border-color:
+    rgba(120,170,255,.08);
+
+  animation:
+    countdownRingB
+    4s linear infinite reverse;
+
+}
+
+
+@keyframes countdownRingA {
+
+  from {
+
+    transform:
+      rotate(0deg)
+      scale(.85);
+
+  }
+
+  to {
+
+    transform:
+      rotate(360deg)
+      scale(1.05);
+
+  }
+
+}
+
+
+@keyframes countdownRingB {
+
+  from {
+
+    transform:
+      rotate(0deg)
+      scale(.8);
+
+  }
+
+  to {
+
+    transform:
+      rotate(360deg)
+      scale(1.1);
+
+  }
+
+}
+
+
+/* =========================================
+   Countdown Number
+   ========================================= */
+
+.countdown-number {
+
+  position: relative;
+
+  z-index: 5;
+
+  font-family:
+    "Cormorant Garamond",
+    serif;
+
+  font-size:
+    clamp(100px, 16vw, 180px);
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  letter-spacing: .04em;
+
+  color:
+    rgba(245,252,255,.96);
+
+  text-shadow:
+
+    0 0 15px
+    rgba(255,255,255,.9),
+
+    0 0 45px
+    rgba(120,220,255,.8),
+
+    0 0 100px
+    rgba(90,120,255,.45);
+
+  animation:
+    countdownNumberIn
+    .8s cubic-bezier(.18,.8,.2,1)
+    both;
+
+}
+
+
+@keyframes countdownNumberIn {
+
+  0% {
+
+    opacity: 0;
+
+    transform:
+      scale(1.7);
+
+    filter:
+      blur(15px);
+
+  }
+
+  35% {
+
+    opacity: 1;
+
+  }
+
+  75% {
+
+    transform:
+      scale(.95);
+
+    filter:
+      blur(0);
+
+  }
+
+  100% {
+
+    opacity: 1;
+
+    transform:
+      scale(1);
+
+  }
+
+}
+
+
+/* =========================================
+   BEGIN
+   ========================================= */
+
+.countdown-go {
+
+  position: relative;
+
+  z-index: 5;
+
+  font-family:
+    "Cormorant Garamond",
+    serif;
+
+  font-size:
+    clamp(54px, 9vw, 100px);
+
+  letter-spacing:
+    .18em;
+
+  padding-left:
+    .18em;
+
+  color:
+    white;
+
+  text-shadow:
+
+    0 0 20px
+    rgba(255,255,255,.9),
+
+    0 0 60px
+    rgba(100,220,255,.9),
+
+    0 0 120px
+    rgba(100,130,255,.7);
+
+  animation:
+    beginBurst
+    .8s cubic-bezier(.18,.8,.2,1)
+    both;
+
+}
+
+
+@keyframes beginBurst {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      scale(.3);
+
+    filter:
+      blur(20px);
+
+  }
+
+  45% {
+
+    opacity: 1;
+
+    transform:
+      scale(1.15);
+
+    filter:
+      blur(0);
+
+  }
+
+  to {
+
+    opacity: 0;
+
+    transform:
+      scale(1.4);
+
+  }
+
+}
+
+
+.countdown-caption {
+
+  position: absolute;
+
+  top:
+    calc(50% + 125px);
+
+  font-size: 8px;
+
+  letter-spacing: .42em;
+
+  color:
+    rgba(220,242,255,.38);
+
+  animation:
+    captionPulse
+    1s ease-in-out infinite;
+
+}
+
+
+@keyframes captionPulse {
+
+  0%, 100% {
+
+    opacity: .25;
+
+  }
+
+  50% {
+
+    opacity: .75;
+
+  }
+
+}
+
+
+/* =========================================
+   GAME ENTRY TRANSITION
+   ========================================= */
+
+.chapter2-game-entering .chapter2-countdown {
+
+  animation:
+    gameBurst
+    .85s cubic-bezier(.2,.8,.15,1)
+    forwards;
+
+}
+
+
+@keyframes gameBurst {
+
+  0% {
+
+    opacity: 1;
+
+  }
+
+  45% {
+
+    opacity: 1;
+
+    transform:
+      scale(1);
+
+  }
+
+  100% {
+
+    opacity: 0;
+
+    transform:
+      scale(1.18);
+
+    filter:
+      blur(12px);
+
+  }
+
+}
+
+
+/* =========================================
+   Wish Bottle Game Container
+   ========================================= */
+
+.wish-bottle-screen {
+
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: 20;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  animation:
+    wishBottleAppear
+    .9s cubic-bezier(.18,.8,.2,1)
+    both;
+
+}
+
+
+@keyframes wishBottleAppear {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      scale(1.06);
+
+    filter:
+      blur(12px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      scale(1);
+
+    filter:
+      blur(0);
+
+  }
+
+}
+
+
+/* =========================================
+   Prevent Global HTML Styles
+   ========================================= */
+
+.chapter2-page h1,
+.chapter2-page h2,
+.chapter2-page p,
+.chapter2-page button {
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .chapter2-intro {
+
+    width: 84vw;
+
+  }
+
+
+  .chapter2-intro h1 {
+
+    font-size: 29px;
+
+    letter-spacing: 5px;
+
+  }
+
+
+  .chapter-number {
+
+    font-size: 10px;
+
+    letter-spacing: 4px;
+
+  }
+
+
+  .chapter2-story-line {
+
+    font-size: 13px;
+
+    letter-spacing: 2px;
+
+  }
+
+
+  .start-chapter2-btn {
+
+    padding:
+      11px 23px;
+
+    font-size: 12px;
+
+  }
+
+
+  /* Confirmation */
+
+  .chapter2-confirm-panel {
+
+    width: 88vw;
+
+    padding:
+      36px 22px 27px;
+
+  }
+
+
+  .chapter2-confirm-panel h2 {
+
+    font-size: 25px;
+
+  }
+
+
+  .confirm-main-text {
+
+    font-size: 13px;
+
+  }
+
+
+  .confirm-sub-text {
+
+    font-size: 10px;
+
+  }
+
+
+  .confirm-actions button {
+
+    height: 40px;
+
+    padding:
+      0 19px;
+
+    font-size: 10px;
+
+  }
+
+
+  .confirm-star-a {
+    left: 8%;
+  }
+
+  .confirm-star-b {
+    right: 8%;
+  }
+
+  .confirm-star-c {
+    left: 12%;
+  }
+
+  .confirm-star-d {
+    right: 12%;
+  }
+
+
+  /* Countdown */
+
+  .countdown-ring {
+
+    width: 130px;
+    height: 130px;
+
+  }
+
+
+  .countdown-ring-b {
+
+    width: 185px;
+    height: 185px;
+
+  }
+
+
+  .countdown-caption {
+
+    top:
+      calc(50% + 100px);
+
+    font-size: 7px;
+
+    letter-spacing: .3em;
+
+  }
+
+
+  .countdown-go {
+
+    font-size: 48px;
+
+  }
+
+}
+
+
+/* =========================================
+   REDUCED MOTION
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+
+    animation-duration:
+      .01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      .01ms !important;
+
+  }
+
+}

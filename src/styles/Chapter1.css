@@ -1,0 +1,126 @@
+.chapter1{
+
+    width:100vw;
+    height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:#050816;
+
+    color:white;
+
+    text-align:center;
+
+}
+
+.chapter-intro{
+
+    animation:fadeIn 1.2s;
+
+}
+
+.chapter-number{
+
+    color:#7dd3fc;
+
+    letter-spacing:8px;
+
+    margin-bottom:15px;
+
+}
+
+.chapter-intro h1{
+
+    font-size:58px;
+
+    color:#9bb3ff;
+
+    text-shadow:
+    0 0 20px #8da2ff,
+    0 0 50px #6c63ff;
+
+}
+
+.chapter-line{
+
+    width:320px;
+    height:2px;
+
+    margin:35px auto;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #7dd3fc,
+        transparent
+    );
+
+}
+
+.story-box{
+
+    animation:fadeIn 1.5s;
+
+}
+
+.story{
+
+    font-size:24px;
+
+    margin:20px;
+
+    letter-spacing:2px;
+
+}
+
+.start-btn{
+
+    margin-top:60px;
+
+    padding:16px 50px;
+
+    border:none;
+
+    border-radius:999px;
+
+    background:linear-gradient(
+        135deg,
+        #6c63ff,
+        #7dd3fc
+    );
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.start-btn:hover{
+
+    transform:scale(1.05);
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}

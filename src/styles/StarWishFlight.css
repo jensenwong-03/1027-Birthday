@@ -1,0 +1,2028 @@
+.star-wish-flight {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+
+  background: #050816;
+
+  font-family:
+    "Noto Sans SC",
+    "Microsoft YaHei",
+    sans-serif;
+
+  color: white;
+
+  user-select: none;
+}
+
+
+/* =========================================================
+   GAME AREA
+========================================================= */
+
+.flight-game {
+  position: relative;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(45, 60, 120, 0.12),
+      transparent 55%
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 0 60px rgba(80, 120, 255, 0.12),
+    inset 0 0 60px rgba(255, 255, 255, 0.025);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+.flight-hud {
+  position: absolute;
+
+  top: 22px;
+  left: 28px;
+  right: 28px;
+
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  pointer-events: none;
+}
+
+.flight-score {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 100px;
+}
+
+.score-label {
+  margin-bottom: 2px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 3px;
+
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.score-number {
+  font-size: 28px;
+  font-weight: 800;
+
+  line-height: 1;
+
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+.score-total {
+  margin-left: 3px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+
+/* =========================================================
+   PROGRESS BAR
+========================================================= */
+
+.flight-progress {
+  width: 240px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.progress-fill {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ffffff,
+      #b9caff,
+      #ffffff
+    );
+
+  box-shadow:
+    0 0 12px rgba(180, 200, 255, 0.8);
+
+  transition: width 0.25s ease;
+}
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+.flight-stars {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 3;
+
+  pointer-events: none;
+
+  overflow: hidden;
+}
+
+.flight-particle {
+  position: absolute;
+
+  display: block;
+
+  border-radius: 50%;
+
+  background: white;
+
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.9);
+}
+
+
+/* =========================================================
+   WISH STAR
+========================================================= */
+
+.wish-star {
+  position: absolute;
+
+  z-index: 12;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+
+  transform-origin: center;
+
+  transition:
+    filter 0.15s ease;
+}
+
+.wish-star-glow {
+  position: absolute;
+
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.32),
+      rgba(150, 180, 255, 0.1) 35%,
+      transparent 70%
+    );
+
+  filter: blur(5px);
+}
+
+.wish-star-core {
+  position: relative;
+
+  z-index: 2;
+
+  color: white;
+
+  font-size: 39px;
+
+  line-height: 1;
+
+  text-shadow:
+    0 0 5px white,
+    0 0 12px rgba(180, 200, 255, 0.9),
+    0 0 25px rgba(130, 160, 255, 0.7);
+}
+
+.wish-star-shine {
+  position: absolute;
+
+  z-index: 3;
+
+  top: -4px;
+  right: -3px;
+
+  font-size: 12px;
+
+  color: white;
+
+  text-shadow:
+    0 0 8px white;
+}
+
+
+/* =========================================================
+   GIFT PIPES
+========================================================= */
+
+.gift-pipe {
+  position: absolute;
+
+  z-index: 8;
+
+  width: 110px;
+
+  overflow: visible;
+
+  background:
+    linear-gradient(
+      90deg,
+      #74658f 0%,
+      #bba7d0 20%,
+      #d9cbe6 48%,
+      #a890bd 75%,
+      #665676 100%
+    );
+
+  border-radius: 12px;
+
+  border: 2px solid rgba(255, 255, 255, 0.32);
+
+  box-shadow:
+    inset 0 0 18px rgba(255, 255, 255, 0.15),
+    0 0 18px rgba(130, 100, 170, 0.2);
+}
+
+.gift-pipe::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.32) 48%,
+      transparent 62%
+    );
+
+  pointer-events: none;
+}
+
+.gift-pipe-top {
+  top: 0;
+
+  border-radius:
+    0
+    0
+    14px
+    14px;
+}
+
+.gift-pipe-bottom {
+  border-radius:
+    14px
+    14px
+    0
+    0;
+}
+
+
+/* =========================================================
+   GIFT RIBBON
+========================================================= */
+
+.gift-ribbon-horizontal {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  top: 50%;
+
+  height: 20px;
+
+  transform: translateY(-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      #eee7ff,
+      #fff,
+      #d9d0ec,
+      #fff,
+      #eee7ff
+    );
+
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.25);
+}
+
+.gift-ribbon-vertical {
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  left: 50%;
+
+  width: 18px;
+
+  transform: translateX(-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      #d8d0e8,
+      #fff,
+      #d8d0e8
+    );
+
+  opacity: 0.95;
+}
+
+
+/* =========================================================
+   GIFT BOW
+========================================================= */
+
+.gift-bow {
+  position: absolute;
+
+  top: 12px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  z-index: 4;
+
+  display: flex;
+
+  align-items: center;
+
+  color: white;
+
+  font-size: 21px;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+.bow-left,
+.bow-right {
+  font-size: 18px;
+
+  opacity: 0.9;
+}
+
+.bow-center {
+  margin: 0 2px;
+
+  font-size: 12px;
+}
+
+.gift-top-decoration {
+  position: absolute;
+
+  right: 10px;
+  bottom: 14px;
+
+  font-size: 14px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  text-shadow:
+    0 0 8px white;
+}
+
+.gift-bottom-decoration {
+  position: absolute;
+
+  left: 10px;
+  top: 14px;
+
+  font-size: 14px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  text-shadow:
+    0 0 8px white;
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.flight-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 50;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(20, 25, 60, 0.32),
+      rgba(2, 5, 18, 0.72)
+    );
+
+  backdrop-filter: blur(3px);
+
+  animation:
+    overlayAppear 0.45s ease both;
+}
+
+@keyframes overlayAppear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.flight-card {
+  position: relative;
+
+  width: 390px;
+
+  padding: 42px 40px 38px;
+
+  text-align: center;
+
+  border-radius: 28px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31, 36, 70, 0.88),
+      rgba(9, 13, 35, 0.94)
+    );
+
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.45),
+    0 0 45px rgba(110, 130, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(18px);
+
+  animation:
+    cardAppear 0.55s
+    cubic-bezier(0.2, 0.8, 0.2, 1)
+    both;
+}
+
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+.flight-card h2 {
+  margin: 14px 0 10px;
+
+  font-size: 31px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  color: white;
+}
+
+.flight-card p {
+  margin: 0;
+
+  font-size: 14px;
+
+  line-height: 1.8;
+
+  color:
+    rgba(255, 255, 255, 0.66);
+}
+
+.flight-card-star {
+  font-size: 52px;
+
+  color: white;
+
+  line-height: 1;
+
+  text-shadow:
+    0 0 8px white,
+    0 0 25px rgba(170, 190, 255, 0.9),
+    0 0 50px rgba(120, 140, 255, 0.5);
+
+  animation:
+    starFloat 2.2s ease-in-out infinite;
+}
+
+@keyframes starFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+
+/* =========================================================
+   HINT
+========================================================= */
+
+.flight-hint {
+  margin-top: 22px !important;
+
+  font-size: 12px !important;
+
+  line-height: 1.8 !important;
+
+  color:
+    rgba(255, 255, 255, 0.42) !important;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.flight-button {
+  margin-top: 28px;
+
+  min-width: 150px;
+
+  padding: 13px 28px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.25);
+
+  border-radius: 999px;
+
+  background:
+    rgba(255, 255, 255, 0.1);
+
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  letter-spacing: 1px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.flight-button:hover {
+  transform: translateY(-2px);
+
+  background:
+    rgba(255, 255, 255, 0.18);
+
+  box-shadow:
+    0 8px 25px
+    rgba(130, 150, 255, 0.18);
+}
+
+.flight-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+.countdown-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 40;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+}
+
+.countdown-number {
+  font-size: 110px;
+
+  font-weight: 200;
+
+  line-height: 1;
+
+  color: white;
+
+  text-shadow:
+    0 0 15px white,
+    0 0 40px rgba(150, 180, 255, 0.8);
+
+  animation:
+    countdownPop 0.85s
+    cubic-bezier(0.2, 0.8, 0.2, 1)
+    both;
+}
+
+@keyframes countdownPop {
+  0% {
+    opacity: 0;
+
+    transform:
+      scale(1.35);
+  }
+
+  30% {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+
+  100% {
+    opacity: 0.2;
+
+    transform:
+      scale(0.82);
+  }
+}
+
+.countdown-text {
+  margin-top: 12px;
+
+  font-size: 13px;
+
+  letter-spacing: 4px;
+
+  color:
+    rgba(255, 255, 255, 0.58);
+}
+
+
+/* =========================================================
+   CONTROL HINT
+========================================================= */
+
+.flight-control-hint {
+  position: absolute;
+
+  bottom: 22px;
+  left: 50%;
+
+  z-index: 18;
+
+  transform:
+    translateX(-50%);
+
+  padding: 7px 14px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(0, 0, 0, 0.2);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  font-size: 9px;
+
+  letter-spacing: 3px;
+
+  color:
+    rgba(255, 255, 255, 0.3);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+.gameover-star {
+  font-size: 48px;
+
+  color: white;
+
+  text-shadow:
+    0 0 10px white,
+    0 0 30px rgba(170, 190, 255, 0.7);
+
+  animation:
+    starFloat 2s ease-in-out infinite;
+}
+
+.gameover-card h2 {
+  margin-top: 14px;
+}
+
+.final-score {
+  display: flex;
+
+  flex-direction: column;
+
+  margin-top: 24px;
+
+  padding: 14px 20px;
+
+  border-radius: 16px;
+
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+}
+
+.final-score span {
+  font-size: 11px;
+
+  color:
+    rgba(255, 255, 255, 0.4);
+
+  letter-spacing: 1px;
+}
+
+.final-score strong {
+  margin-top: 4px;
+
+  font-size: 28px;
+
+  color: white;
+}
+
+.final-score small {
+  font-size: 13px;
+
+  font-weight: 400;
+
+  color:
+    rgba(255, 255, 255, 0.4);
+}
+
+.restart-hint {
+  margin-top: 14px;
+
+  font-size: 11px;
+
+  color:
+    rgba(255, 255, 255, 0.32);
+}
+
+
+/* =========================================================
+   VICTORY
+========================================================= */
+
+.victory-overlay {
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(45, 50, 100, 0.4),
+      rgba(2, 5, 18, 0.78)
+    );
+}
+
+.victory-card {
+  padding-top: 38px;
+}
+
+.victory-icon {
+  width: 76px;
+  height: 76px;
+
+  margin: 0 auto;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 40px;
+
+  color: white;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.18),
+      rgba(130, 150, 255, 0.08)
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.2);
+
+  box-shadow:
+    0 0 30px
+    rgba(170, 190, 255, 0.25),
+    inset 0 0 20px
+    rgba(255, 255, 255, 0.05);
+
+  text-shadow:
+    0 0 10px white,
+    0 0 30px rgba(170, 190, 255, 0.8);
+
+  animation:
+    victoryGlow 2s ease-in-out infinite;
+}
+
+@keyframes victoryGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 25px
+      rgba(170, 190, 255, 0.2);
+  }
+
+  50% {
+    box-shadow:
+      0 0 50px
+      rgba(170, 190, 255, 0.45);
+  }
+}
+
+.victory-small-title {
+  margin-top: 22px;
+
+  font-size: 9px;
+
+  letter-spacing: 4px;
+
+  color:
+    rgba(255, 255, 255, 0.4);
+}
+
+.victory-card h2 {
+  margin-top: 9px;
+}
+
+.victory-score {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  margin-top: 20px;
+
+  font-size: 40px;
+
+  font-weight: 300;
+
+  color: white;
+
+  text-shadow:
+    0 0 20px
+    rgba(180, 200, 255, 0.7);
+}
+
+.victory-score span {
+  font-size: 16px;
+
+  opacity: 0.7;
+}
+
+.victory-message {
+  margin-top: 20px;
+
+  font-size: 13px;
+
+  line-height: 1.8;
+
+  color:
+    rgba(255, 255, 255, 0.55);
+}
+
+.victory-button {
+  margin-top: 24px;
+}
+
+
+/* =========================================================
+   VICTORY FLOATING STARS
+========================================================= */
+
+.victory-stars {
+  position: absolute;
+
+  inset: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.victory-stars span {
+  position: absolute;
+
+  color: white;
+
+  font-size: 15px;
+
+  opacity: 0;
+
+  text-shadow:
+    0 0 10px white,
+    0 0 25px rgba(160, 180, 255, 0.9);
+
+  animation:
+    victoryParticle
+    3s ease-in-out
+    infinite;
+}
+
+.victory-stars span:nth-child(1) {
+  left: 18%;
+  top: 22%;
+
+  animation-delay: 0s;
+}
+
+.victory-stars span:nth-child(2) {
+  left: 78%;
+  top: 18%;
+
+  animation-delay: 0.4s;
+}
+
+.victory-stars span:nth-child(3) {
+  left: 85%;
+  top: 65%;
+
+  animation-delay: 0.8s;
+}
+
+.victory-stars span:nth-child(4) {
+  left: 12%;
+  top: 70%;
+
+  animation-delay: 1.2s;
+}
+
+.victory-stars span:nth-child(5) {
+  left: 28%;
+  top: 12%;
+
+  animation-delay: 1.6s;
+}
+
+.victory-stars span:nth-child(6) {
+  left: 70%;
+  top: 78%;
+
+  animation-delay: 2s;
+}
+
+.victory-stars span:nth-child(7) {
+  left: 50%;
+  top: 10%;
+
+  animation-delay: 2.4s;
+}
+
+@keyframes victoryParticle {
+  0% {
+    opacity: 0;
+
+    transform:
+      translateY(10px)
+      scale(0.6);
+  }
+
+  30% {
+    opacity: 0.9;
+  }
+
+  60% {
+    opacity: 0.5;
+
+    transform:
+      translateY(-15px)
+      scale(1);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translateY(-30px)
+      scale(0.6);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 950px) {
+  .flight-game {
+    transform:
+      scale(
+        calc(
+          (100vw - 30px) / 900
+        )
+      );
+
+    transform-origin: center;
+  }
+}
+
+@media (max-height: 650px) {
+  .flight-game {
+    transform:
+      scale(
+        min(
+          calc((100vw - 30px) / 900),
+          calc((100vh - 30px) / 560)
+        )
+      );
+
+    transform-origin: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .flight-game {
+    transform:
+      scale(
+        calc(
+          (100vw - 20px) / 900
+        )
+      );
+  }
+}
+
+/* =========================================================
+   红色星星奖励动画
+========================================================= */
+
+.star-reward-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(120, 10, 30, 0.30),
+            rgba(5, 3, 15, 0.96) 70%
+        );
+
+    animation:
+        rewardBackgroundIn
+        .7s ease both;
+
+}
+
+
+/* =========================================================
+   星尘
+========================================================= */
+
+.reward-particle-field {
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+}
+
+
+.reward-particle {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    font-size:
+        calc(
+            8px +
+            var(--i) * .45px
+        );
+
+    color: rgba(255,255,255,.9);
+
+    text-shadow:
+        0 0 8px white,
+        0 0 18px rgba(255,80,100,.9);
+
+    opacity: 0;
+
+    animation:
+        rewardParticle
+        2.8s
+        ease-out
+        infinite;
+
+    animation-delay:
+        calc(
+            var(--i) * -0.09s
+        );
+
+}
+
+
+.reward-particle:nth-child(3n) {
+
+    color:
+        rgba(255,80,100,.95);
+
+}
+
+
+.reward-particle:nth-child(3n + 1) {
+
+    color:
+        rgba(255,255,255,.95);
+
+}
+
+
+.reward-particle:nth-child(3n + 2) {
+
+    color:
+        rgba(255,180,190,.95);
+
+}
+
+
+@keyframes rewardParticle {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            translate(-50%, -50%)
+            rotate(0deg)
+            scale(.3);
+
+    }
+
+    20% {
+
+        opacity: 1;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            translate(
+                calc(
+                    -50% +
+                    (var(--i) - 14) * 34px
+                ),
+                calc(
+                    -50% +
+                    (var(--i) - 14) * 24px
+                )
+            )
+            rotate(180deg)
+            scale(1.3);
+
+    }
+
+}
+
+
+/* =========================================================
+   光圈
+========================================================= */
+
+.reward-rings {
+
+    position: absolute;
+
+    width: 430px;
+
+    height: 430px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.reward-ring {
+
+    position: absolute;
+
+    width: 100%;
+
+    height: 100%;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(255,90,110,.18);
+
+    box-shadow:
+        0 0 25px
+        rgba(255,50,80,.12),
+
+        inset 0 0 25px
+        rgba(255,50,80,.08);
+
+    transform: scale(.2);
+
+    opacity: 0;
+
+}
+
+
+.ring-one {
+
+    animation:
+        rewardRingOne
+        2.8s
+        ease-out
+        both;
+
+}
+
+
+.ring-two {
+
+    animation:
+        rewardRingTwo
+        2.8s
+        ease-out
+        both;
+
+}
+
+
+.ring-three {
+
+    animation:
+        rewardRingThree
+        2.8s
+        ease-out
+        both;
+
+}
+
+
+@keyframes rewardRingOne {
+
+    0% {
+
+        opacity: 0;
+
+        transform: scale(.2);
+
+    }
+
+    35% {
+
+        opacity: .8;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform: scale(1.25);
+
+    }
+
+}
+
+
+@keyframes rewardRingTwo {
+
+    0% {
+
+        opacity: 0;
+
+        transform: scale(.1);
+
+    }
+
+    45% {
+
+        opacity: .6;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform: scale(1.55);
+
+    }
+
+}
+
+
+@keyframes rewardRingThree {
+
+    0% {
+
+        opacity: 0;
+
+        transform: scale(.05);
+
+    }
+
+    55% {
+
+        opacity: .45;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform: scale(1.9);
+
+    }
+
+}
+
+
+/* =========================================================
+   红色星星
+========================================================= */
+
+.reward-red-star {
+
+    position: relative;
+
+    z-index: 10;
+
+    width: 170px;
+
+    height: 170px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transform: scale(.1);
+
+    opacity: 0;
+
+}
+
+
+.star-reward-appear
+.reward-red-star {
+
+    animation:
+        redStarAppear
+        1s
+        cubic-bezier(.16,1,.3,1)
+        both;
+
+}
+
+
+.star-reward-glow
+.reward-red-star {
+
+    animation:
+        redStarGlow
+        1.8s
+        ease-in-out
+        both;
+
+}
+
+
+.star-reward-burst
+.reward-red-star {
+
+    animation:
+        redStarBurst
+        1.2s
+        cubic-bezier(.16,1,.3,1)
+        both;
+
+}
+
+
+.reward-star-halo {
+
+    position: absolute;
+
+    width: 180px;
+
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,50,70,.55),
+            rgba(255,30,60,.22) 35%,
+            transparent 72%
+        );
+
+    filter: blur(10px);
+
+}
+
+
+.reward-star-core {
+
+    position: relative;
+
+    z-index: 3;
+
+    font-size: 145px;
+
+    line-height: 1;
+
+    color: #ff5068;
+
+    text-shadow:
+
+        0 0 8px #fff,
+
+        0 0 18px #ffb0b9,
+
+        0 0 35px #ff405c,
+
+        0 0 65px #ff304d,
+
+        0 0 100px rgba(255,30,60,.9),
+
+        0 0 150px rgba(255,20,50,.65);
+
+}
+
+
+.reward-star-shine {
+
+    position: absolute;
+
+    z-index: 5;
+
+    top: 6px;
+
+    right: 10px;
+
+    font-size: 34px;
+
+    color: white;
+
+    text-shadow:
+
+        0 0 10px white,
+
+        0 0 25px #ffb5c0;
+
+    animation:
+        rewardShine
+        1.4s
+        ease-in-out
+        infinite;
+
+}
+
+
+.reward-star-rays {
+
+    position: absolute;
+
+    width: 260px;
+
+    height: 260px;
+
+    border-radius: 50%;
+
+    background:
+
+        conic-gradient(
+            from 0deg,
+            transparent,
+            rgba(255,70,90,.25),
+            transparent 10%,
+            transparent 20%,
+            rgba(255,90,110,.18),
+            transparent 30%,
+            transparent 45%,
+            rgba(255,70,90,.22),
+            transparent 55%,
+            transparent 70%,
+            rgba(255,100,120,.2),
+            transparent 80%,
+            transparent
+        );
+
+    filter: blur(4px);
+
+    animation:
+        rayRotate
+        5s
+        linear
+        infinite;
+
+}
+
+
+/* =========================================================
+   奖励文字
+========================================================= */
+
+.reward-text {
+
+    position: absolute;
+
+    z-index: 20;
+
+    top: calc(50% + 125px);
+
+    width: 100%;
+
+    text-align: center;
+
+    opacity: 0;
+
+    transform:
+        translateY(20px);
+
+}
+
+
+.star-reward-glow
+.reward-text {
+
+    animation:
+        rewardTextIn
+        .8s
+        .25s
+        ease-out
+        both;
+
+}
+
+
+.star-reward-burst
+.reward-text {
+
+    animation:
+        rewardTextFinal
+        .8s
+        ease-out
+        both;
+
+}
+
+
+.reward-small-text {
+
+    font-size: 11px;
+
+    letter-spacing: 5px;
+
+    color:
+        rgba(255,180,190,.7);
+
+    margin-bottom: 10px;
+
+}
+
+
+.reward-text h2 {
+
+    margin: 0;
+
+    font-size: 30px;
+
+    font-weight: 600;
+
+    letter-spacing: 5px;
+
+    color: white;
+
+    text-shadow:
+
+        0 0 10px white,
+
+        0 0 25px #ff5068,
+
+        0 0 45px rgba(255,50,80,.8);
+
+}
+
+
+.reward-text p {
+
+    margin-top: 12px;
+
+    font-size: 14px;
+
+    line-height: 1.9;
+
+    color:
+        rgba(255,255,255,.62);
+
+}
+
+
+/* =========================================================
+   最后爆发白光
+========================================================= */
+
+.reward-flash {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 40;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(255,255,255,1),
+            rgba(255,130,150,.85) 18%,
+            rgba(255,50,80,.25) 40%,
+            transparent 70%
+        );
+
+    opacity: 0;
+
+}
+
+
+.star-reward-burst
+.reward-flash {
+
+    animation:
+        rewardFlash
+        1.2s
+        2s
+        ease-out
+        both;
+
+}
+
+
+/* =========================================================
+   动画
+========================================================= */
+
+@keyframes rewardBackgroundIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            scale(1.08);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes redStarAppear {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.05)
+            rotate(-25deg);
+
+    }
+
+    45% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.18)
+            rotate(8deg);
+
+    }
+
+    70% {
+
+        transform:
+            scale(.94)
+            rotate(-3deg);
+
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            rotate(0deg);
+
+    }
+
+}
+
+
+@keyframes redStarGlow {
+
+    0% {
+
+        opacity: 1;
+
+        transform:
+            scale(1);
+
+    }
+
+    50% {
+
+        transform:
+            scale(1.13);
+
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.06);
+
+    }
+
+}
+
+
+@keyframes redStarBurst {
+
+    0% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.06);
+
+    }
+
+    45% {
+
+        transform:
+            scale(1.28);
+
+    }
+
+    100% {
+
+        opacity: .92;
+
+        transform:
+            scale(1.12);
+
+    }
+
+}
+
+
+@keyframes rewardShine {
+
+    0%,
+    100% {
+
+        transform:
+            scale(.8)
+            rotate(0deg);
+
+        opacity: .65;
+
+    }
+
+    50% {
+
+        transform:
+            scale(1.35)
+            rotate(20deg);
+
+        opacity: 1;
+
+    }
+
+}
+
+
+@keyframes rayRotate {
+
+    from {
+
+        transform:
+            rotate(0deg);
+
+    }
+
+    to {
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+@keyframes rewardTextIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(25px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+@keyframes rewardTextFinal {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(15px)
+            scale(.96);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes rewardFlash {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.5);
+
+    }
+
+    35% {
+
+        opacity: .9;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            scale(1.8);
+
+    }
+
+}

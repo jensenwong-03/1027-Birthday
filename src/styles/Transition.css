@@ -1,0 +1,766 @@
+/* =====================================================
+   TRANSITION BASE
+===================================================== */
+
+.transition {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle,
+      #0f1b44,
+      #050816
+    );
+
+  transition:
+    opacity 0.3s ease;
+
+}
+
+
+.transition.active {
+
+  opacity: 1;
+
+}
+
+
+/* =====================================================
+   ACCESS GRANTED
+===================================================== */
+
+.transition-content {
+
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width: 420px;
+
+  text-align: center;
+
+  color: white;
+
+  z-index: 5;
+
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
+
+}
+
+
+.transition-content.hide {
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  pointer-events: none;
+
+}
+
+
+/* =====================================================
+   ACCESS TITLE
+===================================================== */
+
+.transition h1 {
+
+  font-size: 42px;
+
+  letter-spacing: 8px;
+
+  color: #9bb3ff;
+
+  text-shadow:
+    0 0 20px #8da2ff,
+    0 0 40px #6c63ff;
+
+}
+
+
+/* =====================================================
+   SUB TITLE
+===================================================== */
+
+.sub {
+
+  margin-top: 18px;
+
+  font-size: 18px;
+
+  letter-spacing: 3px;
+
+  opacity: 0.8;
+
+}
+
+
+/* =====================================================
+   SYNC BAR
+===================================================== */
+
+.sync-bar {
+
+  width: 380px;
+
+  height: 10px;
+
+  margin: 40px auto;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.15
+    );
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+}
+
+
+.sync-fill {
+
+  width: 0;
+
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #6c63ff,
+      #7dd3fc
+    );
+
+  animation:
+    syncLoad
+    2s
+    linear
+    forwards;
+
+}
+
+
+@keyframes syncLoad {
+
+  0% {
+
+    width: 0;
+
+  }
+
+  100% {
+
+    width: 100%;
+
+  }
+
+}
+
+
+/* =====================================================
+   LOADING TEXT
+===================================================== */
+
+.loading-text {
+
+  margin-top: 20px;
+
+  font-size: 15px;
+
+  letter-spacing: 2px;
+
+  opacity: 0.8;
+
+}
+
+
+/* =====================================================
+   OPENING BIRTHDAY REALM
+===================================================== */
+
+.opening {
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 100%;
+
+  transform:
+    translate(-50%, -50%);
+
+  text-align: center;
+
+  color: white;
+
+  pointer-events: none;
+
+  z-index: 500;
+
+  animation:
+    openingAppear
+    1.5s
+    cubic-bezier(
+      0.16,
+      0.84,
+      0.26,
+      1
+    )
+    forwards;
+
+}
+
+
+/* =====================================================
+   OPENING SMALL
+===================================================== */
+
+.opening-small {
+
+  font-size: 22px;
+
+  letter-spacing: 8px;
+
+  font-weight: 300;
+
+  margin-bottom: 16px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.9
+    );
+
+  text-shadow:
+    0 0 15px
+    rgba(
+      255,
+      255,
+      255,
+      0.35
+    );
+
+}
+
+
+/* =====================================================
+   BIRTHDAY REALM TITLE
+===================================================== */
+
+.opening-title {
+
+  font-size: 56px;
+
+  font-weight: 300;
+
+  letter-spacing: 6px;
+
+  color: white;
+
+  text-shadow:
+
+    0 0 15px
+    rgba(
+      255,
+      255,
+      255,
+      0.25
+    ),
+
+    0 0 35px
+    rgba(
+      255,
+      255,
+      255,
+      0.18
+    );
+
+}
+
+
+/* =====================================================
+   OPENING ANIMATION
+===================================================== */
+
+@keyframes openingAppear {
+
+  0% {
+
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1.08);
+
+    filter:
+      blur(7px);
+
+  }
+
+
+  20% {
+
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1.02);
+
+    filter:
+      blur(0);
+
+  }
+
+
+  65% {
+
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+
+    filter:
+      blur(0);
+
+  }
+
+
+  100% {
+
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      scale(0.99);
+
+    filter:
+      blur(2px);
+
+  }
+
+}
+
+
+/* =====================================================
+   OPENING TEXT
+===================================================== */
+
+.opening-small,
+.opening-title {
+
+  animation:
+    openingText
+    1.5s
+    ease
+    forwards;
+
+}
+
+
+@keyframes openingText {
+
+  0% {
+
+    opacity: 0;
+
+    transform:
+      translateY(14px);
+
+    filter:
+      blur(6px);
+
+  }
+
+
+  25% {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+    filter:
+      blur(0);
+
+  }
+
+
+  65% {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+    filter:
+      blur(0);
+
+  }
+
+
+  100% {
+
+    opacity: 0;
+
+    transform:
+      translateY(-4px);
+
+    filter:
+      blur(2px);
+
+  }
+
+}
+
+
+/* =====================================================
+   WHITE LIGHT
+===================================================== */
+
+.flash {
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  pointer-events: none;
+
+  overflow: hidden;
+
+  animation:
+    flashBackground
+    11.5s
+    linear
+    forwards;
+
+}
+
+
+/* =====================================================
+   CENTRAL LIGHT
+===================================================== */
+
+.flash-core {
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 180px;
+  height: 180px;
+
+  border-radius: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    scale(0.03);
+
+  background:
+
+    radial-gradient(
+
+      circle,
+
+      rgba(
+        255,
+        255,
+        255,
+        1
+      ) 0%,
+
+      rgba(
+        255,
+        255,
+        255,
+        0.92
+      ) 12%,
+
+      rgba(
+        255,
+        255,
+        255,
+        0.7
+      ) 28%,
+
+      rgba(
+        255,
+        255,
+        255,
+        0.42
+      ) 48%,
+
+      rgba(
+        255,
+        255,
+        255,
+        0.15
+      ) 70%,
+
+      rgba(
+        255,
+        255,
+        255,
+        0
+      ) 100%
+
+    );
+
+  filter:
+    blur(8px);
+
+  will-change:
+    transform,
+    opacity;
+
+  animation:
+    flashCore
+    3.4s
+    cubic-bezier(
+      0.12,
+      0.8,
+      0.2,
+      1
+    )
+    forwards;
+
+}
+
+
+/* =====================================================
+   CENTRAL LIGHT EXPANSION
+===================================================== */
+
+@keyframes flashCore {
+
+  0%{
+
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.02);
+
+    filter:blur(10px);
+
+  }
+
+  12%{
+
+    opacity:.4;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.08);
+
+    filter:blur(12px);
+
+  }
+
+  30%{
+
+    opacity:1;
+
+    transform:
+      translate(-50%,-50%)
+      scale(1);
+
+    filter:blur(14px);
+
+  }
+
+  /* ★ 一口气冲出去 */
+  55%{
+
+    opacity:1;
+
+    transform:
+      translate(-50%,-50%)
+      scale(40);
+
+    filter:blur(24px);
+
+  }
+
+  /* ★ 覆盖整个画面 */
+  75%{
+
+    opacity:.95;
+
+    transform:
+      translate(-50%,-50%)
+      scale(140);
+
+    filter:blur(36px);
+
+  }
+
+  /* 保持 */
+  90%{
+
+    opacity:.95;
+
+    transform:
+      translate(-50%,-50%)
+      scale(170);
+
+    filter:blur(42px);
+
+  }
+
+  /* 消失 */
+  100%{
+
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(210);
+
+    filter:blur(48px);
+
+  }
+
+}
+
+
+/* =====================================================
+   WHITE SCREEN TIMELINE
+
+   0 - 20%
+   中央还在形成
+
+   20 - 50%
+   白光快速扩大
+
+   50 - 65%
+   整个画面变白
+
+   65 - 88%
+   保持白光
+
+   88 - 100%
+   慢慢消失
+===================================================== */
+
+@keyframes flashBackground{
+
+    0%{
+        background:rgba(255,255,255,0);
+    }
+
+    18%{
+        background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.12),
+            rgba(255,255,255,0)
+        );
+    }
+
+    45%{
+        background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.55),
+            rgba(255,255,255,.12),
+            rgba(255,255,255,0)
+        );
+    }
+
+    /* ★ 一瞬间整个画面变白 */
+   58%{
+    background:rgba(255,255,255,.98);
+}
+
+/* ★ 白光保持更久 */
+97%{
+    background:rgba(255,255,255,.98);
+}
+
+/* 慢慢退去 */
+99%{
+    background:rgba(255,255,255,.75);
+}
+
+100%{
+    background:rgba(255,255,255,0);
+}
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+  .transition-content {
+
+    width: 90%;
+
+  }
+
+
+  .transition h1 {
+
+    font-size: 28px;
+
+    letter-spacing: 5px;
+
+  }
+
+
+  .sync-bar {
+
+    width: 80%;
+
+  }
+
+
+  .opening-title {
+
+    font-size: 38px;
+
+    letter-spacing: 4px;
+
+  }
+
+
+  .opening-small {
+
+    font-size: 16px;
+
+    letter-spacing: 5px;
+
+  }
+
+}
