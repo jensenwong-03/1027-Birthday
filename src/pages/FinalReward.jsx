@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "../styles/FinalReward.css";
-import birthdayVideo from "../assets/birthday.mp4";
-
-const VIDEO_SRC = birthdayVideo;
+const VIDEO_SRC = "https://pub-4ba84e432b974580adef222fef9de7da.r2.dev/birthday.mp4";
 
 /* =========================================================
    PARTICLE FIELD
