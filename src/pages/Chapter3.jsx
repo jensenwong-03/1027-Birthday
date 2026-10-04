@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import "../styles/Chapter3.css";
 
 import {
@@ -32,6 +32,13 @@ const PLAYER_HEIGHT = 3;
 
 const KEY_COLLECT_DISTANCE = 4.5;
 const GATE_TRIGGER_DISTANCE = 6;
+
+/* =========================================================
+   MOBILE CONTROLS
+   ========================================================= */
+
+const MOBILE_LOOK_SENSITIVITY = 0.0026;
+const MOBILE_PITCH_LIMIT = 1.32;
 
 
 /* =========================================================
@@ -437,7 +444,9 @@ function Player({
   onGateEnter,
   onPlayerMove,
   enteringGate,
-  gameEnded
+  gameEnded,
+  mobileInput,
+  isMobile
 }) {
 
   const { camera } =
@@ -646,12 +655,51 @@ function Player({
         return;
       }
 
+      /* ===================================================
+         MOBILE CAMERA LOOK
+         右侧触摸区域提供第一人称视角
+         =================================================== */
+
+      if (
+        isMobile &&
+        (
+          mobileInput.current.lookX !== 0 ||
+          mobileInput.current.lookY !== 0
+        )
+      ) {
+
+        camera.rotation.order = "YXZ";
+
+        camera.rotation.y -=
+          mobileInput.current.lookX;
+
+        camera.rotation.x -=
+          mobileInput.current.lookY;
+
+        camera.rotation.x =
+          THREE.MathUtils.clamp(
+            camera.rotation.x,
+            -MOBILE_PITCH_LIMIT,
+            MOBILE_PITCH_LIMIT
+          );
+
+        mobileInput.current.lookX = 0;
+        mobileInput.current.lookY = 0;
+      }
+
 
       /* ===================================================
          GATE WALK
          =================================================== */
 
       if (enteringGate) {
+
+        mobileInput.current.moveX = 0;
+        mobileInput.current.moveZ = 0;
+        mobileInput.current.run = false;
+        mobileInput.current.jump = false;
+        mobileInput.current.lookX = 0;
+        mobileInput.current.lookY = 0;
 
         reusableGateDirection.set(
           GATE_POSITION[0] - camera.position.x,
@@ -754,6 +802,43 @@ function Player({
 
 
       /* ===================================================
+         MOBILE JOYSTICK
+         =================================================== */
+
+      if (isMobile) {
+
+        moveX += mobileInput.current.moveX;
+        moveZ += mobileInput.current.moveZ;
+
+        moveX = THREE.MathUtils.clamp(moveX, -1, 1);
+        moveZ = THREE.MathUtils.clamp(moveZ, -1, 1);
+
+      }
+
+
+      /* ===================================================
+         MOBILE JUMP
+         =================================================== */
+
+      if (
+        isMobile &&
+        mobileInput.current.jump
+      ) {
+
+        if (
+          canJump.current &&
+          !enteringGate
+        ) {
+          velocityY.current = 8;
+          canJump.current = false;
+        }
+
+        mobileInput.current.jump = false;
+
+      }
+
+
+      /* ===================================================
          MOVEMENT
          =================================================== */
 
@@ -811,7 +896,8 @@ function Player({
           keys.current.ShiftLeft ||
           keys.current.ShiftRight ||
           keys.current.shift ||
-          keys.current.Shift;
+          keys.current.Shift ||
+          (isMobile && mobileInput.current.run);
 
 
         const speed =
@@ -2514,7 +2600,8 @@ function StonePath({
 function GlowMushroom({
   position,
   color = "#a6e8ff",
-  scale = 1
+  scale = 1,
+  mobile = false
 }) {
 
   return (
@@ -2572,11 +2659,13 @@ function GlowMushroom({
       </mesh>
 
 
-      <pointLight
-        color={color}
-        intensity={0.55}
-        distance={5}
-      />
+      {!mobile && (
+        <pointLight
+          color={color}
+          intensity={0.55}
+          distance={5}
+        />
+      )}
 
     </group>
 
@@ -2590,7 +2679,8 @@ function GlowMushroom({
    ========================================================= */
 
 function Lantern({
-  position
+  position,
+  mobile = false
 }) {
 
   return (
@@ -2650,6 +2740,7 @@ function Lantern({
       </mesh>
 
 
+{!mobile && (
       <pointLight
         position={[
           0,
@@ -2660,6 +2751,7 @@ function Lantern({
         intensity={1.2}
         distance={8}
       />
+      )}
 
     </group>
 
@@ -2928,7 +3020,7 @@ function RuinDebris() {
    FIREFLIES
    ========================================================= */
 
-function Fireflies() {
+function Fireflies({ mobile = false }) {
 
   const positions =
     useMemo(() => {
@@ -2938,7 +3030,7 @@ function Fireflies() {
 
       for (
         let i = 0;
-        i < 90;
+        i < (mobile ? 45 : 90);
         i++
       ) {
 
@@ -3002,7 +3094,7 @@ function Fireflies() {
    WORLD LANDMARKS
    ========================================================= */
 
-function WorldLandmarks() {
+function WorldLandmarks({ mobile = false }) {
 
   return (
 
@@ -3057,6 +3149,7 @@ function WorldLandmarks() {
          =================================================== */}
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           -45,
           0,
@@ -3067,6 +3160,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           -52,
           0,
@@ -3077,6 +3171,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           -40,
           0,
@@ -3087,6 +3182,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           -60,
           0,
@@ -3102,6 +3198,7 @@ function WorldLandmarks() {
          =================================================== */}
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           38,
           0,
@@ -3112,6 +3209,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           51,
           0,
@@ -3122,6 +3220,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           64,
           0,
@@ -3162,6 +3261,7 @@ function WorldLandmarks() {
 
 
       <Lantern
+        mobile={mobile}
         position={[
           48,
           0,
@@ -3170,6 +3270,7 @@ function WorldLandmarks() {
       />
 
       <Lantern
+        mobile={mobile}
         position={[
           62,
           0,
@@ -3178,6 +3279,7 @@ function WorldLandmarks() {
       />
 
       <Lantern
+        mobile={mobile}
         position={[
           -69,
           0,
@@ -3186,6 +3288,7 @@ function WorldLandmarks() {
       />
 
       <Lantern
+        mobile={mobile}
         position={[
           31,
           0,
@@ -3202,6 +3305,7 @@ function WorldLandmarks() {
 
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           -40,
           0,
@@ -3212,6 +3316,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           -55,
           0,
@@ -3227,6 +3332,7 @@ function WorldLandmarks() {
          =================================================== */}
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           47,
           0,
@@ -3237,6 +3343,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           60,
           0,
@@ -3247,6 +3354,7 @@ function WorldLandmarks() {
       />
 
       <GlowMushroom
+        mobile={mobile}
         position={[
           50,
           0,
@@ -3284,7 +3392,7 @@ function randomPosition() {
 }
 
 
-function WorldDecoration() {
+function WorldDecoration({ mobile = false }) {
 
   const objects =
     useMemo(() => {
@@ -3303,7 +3411,7 @@ function WorldDecoration() {
         result.filter(
           o =>
             o.type === "tree"
-        ).length < 30 &&
+        ).length < (mobile ? 30 : 42) &&
         attempts < 500
       ) {
 
@@ -3413,7 +3521,7 @@ function WorldDecoration() {
 
       for (
         let i = 0;
-        i < 40;
+        i < (mobile ? 26 : 40);
         i++
       ) {
 
@@ -3479,7 +3587,7 @@ function WorldDecoration() {
 
       for (
         let i = 0;
-        i < 25;
+        i < (mobile ? 16 : 25);
         i++
       ) {
 
@@ -3533,7 +3641,7 @@ function WorldDecoration() {
 
       return result;
 
-    }, []);
+    }, [mobile]);
 
 
   WORLD_DECORATION_COLLIDERS =
@@ -3731,7 +3839,7 @@ function WorldDecoration() {
    3D SPAWN EFFECT
    ========================================================= */
 
-function SpawnEffect3D() {
+function SpawnEffect3D({ mobile = false }) {
 
   const group =
     useRef();
@@ -3974,7 +4082,7 @@ function SpawnEffect3D() {
 
 
       <Sparkles
-        count={45}
+        count={mobile ? 18 : 45}
         scale={[
           8,
           9,
@@ -3997,7 +4105,8 @@ function SpawnEffect3D() {
 
 function StarKey({
   position,
-  collected
+  collected,
+  mobile = false
 }) {
 
   const group =
@@ -4122,7 +4231,7 @@ function StarKey({
 
 
       <Sparkles
-        count={10}
+        count={mobile ? 4 : 10}
         scale={[
           3.5,
           3.5,
@@ -4145,7 +4254,8 @@ function StarKey({
 
 function StarGate({
   unlocked,
-  entering
+  entering,
+  mobile = false
 }) {
 
   const group =
@@ -4162,6 +4272,12 @@ function StarGate({
 
   const core =
     useRef();
+
+  const enteringScale =
+    useMemo(
+      () => new THREE.Vector3(1.45, 1.45, 1.45),
+      []
+    );
 
 
   useFrame(
@@ -4214,11 +4330,7 @@ function StarGate({
       ) {
 
         group.current.scale.lerp(
-          new THREE.Vector3(
-            1.45,
-            1.45,
-            1.45
-          ),
+          enteringScale,
           0.035
         );
 
@@ -4507,7 +4619,7 @@ function StarGate({
         <>
 
           <Sparkles
-            count={55}
+            count={mobile ? 18 : 55}
             scale={[
               15,
               14,
@@ -4519,7 +4631,7 @@ function StarGate({
 
 
           <Sparkles
-            count={25}
+            count={mobile ? 10 : 25}
             scale={[
               9,
               9,
@@ -4545,7 +4657,7 @@ function StarGate({
    ========================================================= */
 
 function Minimap({
-  playerPosition,
+  playerMarkerRef,
   keyPositions,
   collectedKeys,
   gateUnlocked
@@ -4664,17 +4776,11 @@ function Minimap({
 
 
         <div
+          ref={playerMarkerRef}
           className="map-player"
           style={{
-            left:
-              `${mapX(
-                playerPosition.x
-              )}%`,
-
-            top:
-              `${mapY(
-                playerPosition.z
-              )}%`
+            left: "50%",
+            top: `${(65 / mapSize) * 100 + 50}%`
           }}
         />
 
@@ -4685,6 +4791,20 @@ function Minimap({
   );
 
 }
+
+
+/* =========================================================
+   STATIC R3F COMPONENT MEMOIZATION
+   避免外层 HUD / minimap 状态更新时重新执行整套世界 JSX
+   ========================================================= */
+
+const MemoGround = memo(Ground);
+const MemoRiver = memo(River);
+const MemoDistantMountains = memo(DistantMountains);
+const MemoWorldDecoration = memo(WorldDecoration);
+const MemoWorldLandmarks = memo(WorldLandmarks);
+const MemoFireflies = memo(Fireflies);
+const MemoMinimap = memo(Minimap);
 
 
 /* =========================================================
@@ -4713,15 +4833,6 @@ function Chapter3({
   ] = useState(
     "请寻找散落在星海中的四把钥匙"
   );
-
-
-  const [
-    playerPosition,
-    setPlayerPosition
-  ] = useState({
-    x: 0,
-    z: 65
-  });
 
 
   const [
@@ -4782,6 +4893,86 @@ function Chapter3({
 
 
   /* =======================================================
+     MOBILE INPUT
+     ======================================================= */
+
+  const mobileInput =
+    useRef({
+      moveX: 0,
+      moveZ: 0,
+      lookX: 0,
+      lookY: 0,
+      run: false,
+      jump: false
+    });
+
+  const joystickPointerId =
+    useRef(null);
+
+  const lookPointerId =
+    useRef(null);
+
+  const joystickRect =
+    useRef(null);
+
+  const joystickVisualRef =
+    useRef(null);
+
+  const joystickKnobRef =
+    useRef(null);
+
+  const minimapPlayerRef =
+    useRef(null);
+
+  const mobileRunButtonRef =
+    useRef(null);
+
+  const lastLookX =
+    useRef(0);
+
+  const lastLookY =
+    useRef(0);
+
+  const [
+    isMobile,
+    setIsMobile
+  ] = useState(() => {
+
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return (
+      window.innerWidth <= 800 ||
+      window.matchMedia("(pointer: coarse)").matches
+    );
+
+  });
+
+
+  const [
+    isPortraitMobile,
+    setIsPortraitMobile
+  ] = useState(false);
+
+  const [
+    showLandscapeHint,
+    setShowLandscapeHint
+  ] = useState(false);
+
+  const [
+    gateResponseFading,
+    setGateResponseFading
+  ] = useState(false);
+
+
+  const [
+    showGateReady,
+    setShowGateReady
+  ] = useState(false);
+
+
+  /* =======================================================
      EXIT POINTER LOCK WHEN THE GAME ENDS
      ======================================================= */
 
@@ -4792,6 +4983,353 @@ function Chapter3({
       document.exitPointerLock?.();
     }
   }, [gameEnded]);
+
+
+  /* =======================================================
+     MOBILE DETECTION
+     ======================================================= */
+
+  useEffect(() => {
+
+    function updateDeviceMode() {
+
+      const coarse =
+        window.matchMedia("(pointer: coarse)").matches;
+
+      setIsMobile(
+        window.innerWidth <= 800 || coarse
+      );
+
+    }
+
+    updateDeviceMode();
+    window.addEventListener("resize", updateDeviceMode);
+
+    return () => {
+      window.removeEventListener("resize", updateDeviceMode);
+    };
+
+  }, []);
+
+
+  /* =======================================================
+     PORTRAIT / LANDSCAPE DETECTION
+     ======================================================= */
+
+  useEffect(() => {
+
+    function updateOrientation() {
+
+      if (typeof window === "undefined") {
+        return;
+      }
+
+      setIsPortraitMobile(
+        isMobile &&
+        window.innerHeight > window.innerWidth
+      );
+
+    }
+
+    updateOrientation();
+
+    window.addEventListener(
+      "resize",
+      updateOrientation
+    );
+
+    window.addEventListener(
+      "orientationchange",
+      updateOrientation
+    );
+
+    return () => {
+
+      window.removeEventListener(
+        "resize",
+        updateOrientation
+      );
+
+      window.removeEventListener(
+        "orientationchange",
+        updateOrientation
+      );
+
+    };
+
+  }, [isMobile]);
+
+
+  /* =======================================================
+     PORTRAIT LANDSCAPE HINT
+     ======================================================= */
+
+  useEffect(() => {
+
+    if (
+      !isMobile ||
+      !isPortraitMobile ||
+      gameEnded
+    ) {
+
+      setShowLandscapeHint(false);
+      return;
+
+    }
+
+    setShowLandscapeHint(true);
+
+    const timer =
+      window.setTimeout(() => {
+        setShowLandscapeHint(false);
+      }, 4200);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+
+  }, [
+    isMobile,
+    isPortraitMobile,
+    gameEnded
+  ]);
+
+
+  /* =======================================================
+     GATE READY HINT
+     四把钥匙集齐后只出现一次：
+     出现 → 停留 → 渐渐淡出 → 自动消失
+     ======================================================= */
+
+  useEffect(() => {
+
+    if (
+      !gateUnlocked ||
+      gameEnded ||
+      enteringGate
+    ) {
+
+      setShowGateReady(false);
+      return;
+
+    }
+
+
+    setShowGateReady(true);
+
+    const timer =
+      window.setTimeout(() => {
+        setShowGateReady(false);
+      }, 3600);
+
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+
+  }, [
+    gateUnlocked,
+    gameEnded,
+    enteringGate
+  ]);
+
+
+  /* =======================================================
+     RESET MOBILE INPUT WHEN GAME ENDS / GATE STARTS
+     ======================================================= */
+
+  useEffect(() => {
+
+    if (gameEnded || enteringGate) {
+      mobileInput.current.moveX = 0;
+      mobileInput.current.moveZ = 0;
+      mobileInput.current.lookX = 0;
+      mobileInput.current.lookY = 0;
+      mobileInput.current.run = false;
+      mobileInput.current.jump = false;
+      joystickPointerId.current = null;
+      lookPointerId.current = null;
+
+      if (joystickKnobRef.current) {
+        joystickKnobRef.current.style.transform = "translate(0, 0)";
+      }
+
+      if (joystickVisualRef.current) {
+        joystickVisualRef.current.style.opacity = "0";
+      }
+
+      if (mobileRunButtonRef.current) {
+        mobileRunButtonRef.current.classList.remove("active");
+      }
+    }
+
+  }, [gameEnded, enteringGate]);
+
+
+  /* =======================================================
+     MOBILE JOYSTICK
+     ======================================================= */
+
+  function updateJoystick(clientX, clientY) {
+
+    const start = joystickRect.current;
+
+    if (!start) return;
+
+    const centerX = start.left;
+    const centerY = start.top;
+    const radius = 58;
+
+    let dx = clientX - centerX;
+    let dy = clientY - centerY;
+
+    const length = Math.hypot(dx, dy);
+
+    if (length > radius) {
+      const scale = radius / length;
+      dx *= scale;
+      dy *= scale;
+    }
+
+    mobileInput.current.moveX = THREE.MathUtils.clamp(dx / radius, -1, 1);
+    mobileInput.current.moveZ = THREE.MathUtils.clamp(dy / radius, -1, 1);
+
+    if (joystickVisualRef.current) {
+      joystickVisualRef.current.style.left = `${centerX}px`;
+      joystickVisualRef.current.style.top = `${centerY}px`;
+      joystickVisualRef.current.style.opacity = "1";
+    }
+
+    if (joystickKnobRef.current) {
+      joystickKnobRef.current.style.transform =
+        `translate(${dx}px, ${dy}px)`;
+    }
+  }
+
+  function handleJoystickDown(e) {
+
+    if (!isMobile || gameEnded || enteringGate) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    joystickPointerId.current = e.pointerId;
+    joystickRect.current = {
+      left: e.clientX,
+      top: e.clientY
+    };
+
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    updateJoystick(e.clientX, e.clientY);
+  }
+
+
+  function handleJoystickMove(e) {
+
+    if (e.pointerId !== joystickPointerId.current) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    updateJoystick(e.clientX, e.clientY);
+  }
+
+
+  function resetJoystick(e) {
+
+    if (e?.pointerId != null && e.pointerId !== joystickPointerId.current) return;
+
+    mobileInput.current.moveX = 0;
+    mobileInput.current.moveZ = 0;
+    joystickPointerId.current = null;
+
+    if (joystickKnobRef.current) {
+      joystickKnobRef.current.style.transform = "translate(0, 0)";
+    }
+
+    if (joystickVisualRef.current) {
+      joystickVisualRef.current.style.opacity = "0";
+    }
+
+    joystickRect.current = null;
+  }
+
+
+  /* =======================================================
+     MOBILE LOOK
+     ======================================================= */
+
+  function handleLookDown(e) {
+
+    if (!isMobile || gameEnded || enteringGate) return;
+
+    e.preventDefault();
+
+    lookPointerId.current = e.pointerId;
+    lastLookX.current = e.clientX;
+    lastLookY.current = e.clientY;
+
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  }
+
+
+  function handleLookMove(e) {
+
+    if (e.pointerId !== lookPointerId.current) return;
+
+    e.preventDefault();
+
+    const dx = e.clientX - lastLookX.current;
+    const dy = e.clientY - lastLookY.current;
+
+    lastLookX.current = e.clientX;
+    lastLookY.current = e.clientY;
+
+    mobileInput.current.lookX +=
+      dx * MOBILE_LOOK_SENSITIVITY;
+
+    mobileInput.current.lookY +=
+      dy * MOBILE_LOOK_SENSITIVITY;
+  }
+
+
+  function resetLook(e) {
+
+    if (e?.pointerId != null && e.pointerId !== lookPointerId.current) return;
+
+    lookPointerId.current = null;
+  }
+
+
+  function mobileJump(e) {
+
+    if (!isMobile || gameEnded || enteringGate) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    mobileInput.current.jump = true;
+  }
+
+
+  function mobileRunStart(e) {
+
+    if (!isMobile || gameEnded || enteringGate) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    mobileInput.current.run = true;
+    mobileRunButtonRef.current = e.currentTarget;
+    e.currentTarget.classList.add("active");
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  }
+
+
+  function mobileRunEnd(e) {
+
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
+    mobileInput.current.run = false;
+    mobileRunButtonRef.current?.classList.remove("active");
+  }
 
 
   /* =======================================================
@@ -4940,10 +5478,16 @@ function Chapter3({
 
     /*
      * 从这一刻开始，第三关已经结束。
-     * 不再允许 WASD / 鼠标继续控制玩家。
+     * 立即退出 Pointer Lock，避免进入星空之门后
+     * 鼠标事件继续驱动第一人称视角，造成半拍延迟。
      */
+    if (document.pointerLockElement) {
+      document.exitPointerLock?.();
+    }
+
     setGameEnded(true);
     setEnteringGate(true);
+    setShowGateReady(false);
     setShowGateResponse(true);
     setShowGateComplete(false);
 
@@ -4951,13 +5495,20 @@ function Chapter3({
       "星空之门正在回应你的呼唤……"
     );
 
+    setGateResponseFading(false);
+
     /*
-     * 先完整播放“星空之门正在回应”过渡，
-     * 再出现最终提示板。
+     * STAR GATE AWAKENED：
+     * 先显示 → 停留 → 淡出 → 完成提示板。
      */
     window.setTimeout(() => {
-      setShowGateResponse(false);
-      setShowGateComplete(true);
+      setGateResponseFading(true);
+
+      window.setTimeout(() => {
+        setShowGateResponse(false);
+        setShowGateComplete(true);
+        setGateResponseFading(false);
+      }, 700);
     }, 1800);
 
   }
@@ -4973,7 +5524,9 @@ function Chapter3({
     if (showReward) return;
 
     setShowGateComplete(false);
+    setShowGateReady(false);
     setShowGateResponse(false);
+    setGateResponseFading(false);
     setEnteringGate(false);
     setShowReward(true);
     setRewardPhase("appear");
@@ -4998,39 +5551,27 @@ function Chapter3({
      PLAYER POSITION
      ======================================================= */
 
-  const lastMapUpdate =
-    useRef(0);
-
-
   function updatePlayer(
     x,
     z
   ) {
 
-    const now =
-      performance.now();
+    const marker =
+      minimapPlayerRef.current;
 
+    if (!marker) return;
 
-    if (
-      now -
-      lastMapUpdate.current <
-      400
-    ) {
+    const mapX =
+      ((x / 180) * 100) + 50;
 
-      return;
+    const mapY =
+      ((z / 180) * 100) + 50;
 
-    }
+    marker.style.left =
+      `${mapX}%`;
 
-
-    lastMapUpdate.current =
-      now;
-
-
-    setPlayerPosition({
-      x,
-      z
-    });
-
+    marker.style.top =
+      `${mapY}%`;
   }
 
 
@@ -5045,6 +5586,79 @@ function Chapter3({
         }`
       }
     >
+
+      {/* =================================================
+          MOBILE PORTRAIT LANDSCAPE HINT
+         ================================================= */}
+
+      {showLandscapeHint && isPortraitMobile && (
+
+        <div
+          className="chapter3-landscape-hint"
+          style={{
+            position: "fixed",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 130,
+            width: "min(310px, calc(100vw - 48px))",
+            padding: "24px 24px 22px",
+            boxSizing: "border-box",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            pointerEvents: "none",
+            borderRadius: "18px",
+            background: "linear-gradient(180deg, rgba(7,12,30,.96), rgba(3,7,20,.94))",
+            border: "1px solid rgba(255,255,255,.15)",
+            boxShadow: "0 20px 70px rgba(0,0,0,.65), 0 0 45px rgba(100,140,255,.12)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            opacity: 1,
+            transition: "opacity .45s ease"
+          }}
+        >
+
+          <div
+            style={{
+              marginBottom: "11px",
+              fontSize: "30px",
+              lineHeight: 1,
+              color: "rgba(255,255,255,.92)",
+              textShadow: "0 0 14px rgba(255,255,255,.75), 0 0 28px rgba(120,160,255,.45)"
+            }}
+          >
+            ↔
+          </div>
+
+          <div
+            style={{
+              fontSize: "17px",
+              letterSpacing: ".12em",
+              color: "#fff"
+            }}
+          >
+            请切换横屏体验
+          </div>
+
+          <div
+            style={{
+              marginTop: "9px",
+              fontSize: "10px",
+              lineHeight: 1.8,
+              letterSpacing: ".08em",
+              color: "rgba(225,232,255,.58)"
+            }}
+          >
+            横屏将获得更完整的星海视野
+          </div>
+
+        </div>
+
+      )}
+
 
       {/* =================================================
           SPAWN EFFECT
@@ -5173,9 +5787,9 @@ function Chapter3({
           MINIMAP
          ================================================= */}
 
-      <Minimap
-        playerPosition={
-          playerPosition
+      <MemoMinimap
+        playerMarkerRef={
+          minimapPlayerRef
         }
 
         keyPositions={
@@ -5211,10 +5825,11 @@ function Chapter3({
           far: 260
         }}
 
-        dpr={[
-          0.9,
-          1
-        ]}
+        dpr={
+          isMobile
+            ? [0.65, 0.85]
+            : [0.9, 1]
+        }
 
         gl={{
           antialias: false,
@@ -5302,7 +5917,7 @@ function Chapter3({
         <Stars
           radius={180}
           depth={90}
-          count={650}
+          count={isMobile ? 350 : 650}
           factor={3.5}
           saturation={0}
           fade
@@ -5326,21 +5941,21 @@ function Chapter3({
             WORLD
            ================================================= */}
 
-        <Ground />
+        <MemoGround />
 
-        <River />
+        <MemoRiver />
 
-        <DistantMountains />
+        <MemoDistantMountains />
 
-        <WorldDecoration />
+        <MemoWorldDecoration mobile={isMobile} />
 
-        <WorldLandmarks />
+        <MemoWorldLandmarks mobile={isMobile} />
 
-        <Fireflies />
+        <MemoFireflies mobile={isMobile} />
 
 
         {showSpawnEffect && (
-          <SpawnEffect3D />
+          <SpawnEffect3D mobile={isMobile} />
         )}
 
 
@@ -5352,6 +5967,7 @@ function Chapter3({
           (key, index) => (
 
             <StarKey
+              mobile={isMobile}
               key={index}
               position={
                 key.position
@@ -5372,6 +5988,7 @@ function Chapter3({
            ================================================= */}
 
         <StarGate
+          mobile={isMobile}
           unlocked={
             gateUnlocked
           }
@@ -5414,14 +6031,100 @@ function Chapter3({
           gameEnded={
             gameEnded
           }
+
+          mobileInput={
+            mobileInput
+          }
+
+          isMobile={
+            isMobile
+          }
         />
 
 
-        {!gameEnded && (
+        {!gameEnded && !isMobile && (
           <PointerLockControls />
         )}
 
       </Canvas>
+
+
+      {/* =================================================
+          MOBILE CONTROLS
+         ================================================= */}
+
+      {isMobile && !gameEnded && !enteringGate && (
+
+        <>
+
+          <div
+            className="chapter3-mobile-look-zone"
+            onPointerDown={handleLookDown}
+            onPointerMove={handleLookMove}
+            onPointerUp={resetLook}
+            onPointerCancel={resetLook}
+            onPointerLeave={resetLook}
+          />
+
+
+          <div
+            className="chapter3-mobile-joystick"
+            onPointerDown={handleJoystickDown}
+            onPointerMove={handleJoystickMove}
+            onPointerUp={resetJoystick}
+            onPointerCancel={resetJoystick}
+          >
+
+            <div
+              ref={joystickVisualRef}
+              className="mobile-joystick-visual"
+            >
+              <div className="mobile-joystick-ring">
+              <div
+                ref={joystickKnobRef}
+                className="mobile-joystick-knob"
+              />
+              </div>
+            </div>
+
+          </div>
+
+
+          <div className="chapter3-mobile-actions">
+
+            <button
+              type="button"
+              className="mobile-action mobile-jump"
+              onPointerDown={mobileJump}
+            >
+              <span>↑</span>
+              <small>跳跃</small>
+            </button>
+
+            <button
+              type="button"
+              ref={mobileRunButtonRef}
+              className="mobile-action mobile-run"
+              onPointerDown={mobileRunStart}
+              onPointerUp={mobileRunEnd}
+              onPointerCancel={mobileRunEnd}
+              onPointerLeave={mobileRunEnd}
+            >
+              <span>✦</span>
+              <small>奔跑</small>
+            </button>
+
+          </div>
+
+
+          <div className="chapter3-mobile-look-hint">
+            <span>滑动右侧</span>
+            <small>转动视角</small>
+          </div>
+
+        </>
+
+      )}
 
 
       {/* =================================================
@@ -5565,11 +6268,18 @@ function Chapter3({
           GATE READY
          ================================================= */}
 
-      {gateUnlocked &&
-        !enteringGate && (
+      {showGateReady &&
+        gateUnlocked &&
+        !enteringGate &&
+        !showGateResponse && (
 
           <div
             className="chapter3-gate-ready"
+            style={{
+              bottom: isPortraitMobile ? "245px" : "185px",
+              zIndex: 34,
+              animation: "chapter3GateReadySequence 3.6s ease forwards"
+            }}
           >
 
             <div
@@ -5618,16 +6328,42 @@ function Chapter3({
 
       )}
 
-
       {/* =================================================
           THIRD CHAPTER COMPLETE BOARD
          ================================================= */}
 
       {showGateComplete && !showReward && (
 
-        <div className="chapter3-complete-overlay">
+        <div
+          className="chapter3-complete-overlay"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 90,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 20px",
+            boxSizing: "border-box",
+            background: "transparent",
+            backdropFilter: "none",
+            WebkitBackdropFilter: "none",
+            pointerEvents: "none",
+            transform: "none"
+          }}
+        >
 
-          <div className="chapter3-complete-card">
+          <div
+            className="chapter3-complete-card"
+            style={{
+              width: "min(430px, calc(100vw - 40px))",
+              padding: "24px 28px 20px",
+              boxSizing: "border-box",
+              textAlign: "center",
+              borderRadius: "18px",
+              pointerEvents: "auto"
+            }}
+          >
 
             <div className="chapter3-complete-symbol">✦</div>
 
@@ -5660,6 +6396,31 @@ function Chapter3({
       {/* =================================================
           THIRD STAR REWARD
          ================================================= */}
+
+      <style>{`
+        @keyframes chapter3GateReadySequence {
+          0% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px) scale(.97);
+          }
+
+          12% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+          }
+
+          68% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+          }
+
+          100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-10px) scale(.98);
+          }
+        }
+      `}</style>
+
 
       {showReward && (
 

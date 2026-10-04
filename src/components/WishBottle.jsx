@@ -26,6 +26,7 @@ const REWARD_DURATION = 3200;
 ========================================================= */
 
 function createStar(id, forcedX = null) {
+
   const type =
     Math.random() < SPECIAL_CHANCE
       ? "special"
@@ -36,6 +37,7 @@ function createStar(id, forcedX = null) {
 
   return {
     id,
+
     type,
 
     x:
@@ -56,7 +58,6 @@ function createStar(id, forcedX = null) {
         : 24 +
           Math.random() * 14,
 
-    // ⚡ 整体加快游戏节奏
     speed:
       isFast
         ? 8.0 +
@@ -86,55 +87,26 @@ function WishBottle({ onComplete }) {
 
   /* =======================================================
      DISPLAY STATE
+
+     IMPORTANT:
+     游戏进行过程中尽量不使用 React state 更新 HUD。
+     避免接星星时整棵 React tree rerender。
   ======================================================= */
 
   const [stars, setStars] =
     useState([]);
 
-
-  const [bottleX, setBottleX] =
-    useState(
-      GAME_WIDTH / 2 -
-      BOTTLE_WIDTH / 2
-    );
-
-
-  /*
-   * 星愿收集
-   *
-   * 普通星星 = +1
-   * 特别星星 = +2
-   *
-   * 27 = 最终目标
-   */
-
-  const [collectedStars, setCollectedStars] =
-    useState(0);
-
-
-  const [shield, setShield] =
-    useState(MAX_SHIELD);
-
-
   const [gameOver, setGameOver] =
     useState(false);
-
 
   const [completed, setCompleted] =
     useState(false);
 
-
-  const [message, setMessage] =
-    useState("");
-
-
   const [dragging, setDragging] =
     useState(false);
 
-
   const [showBriefing, setShowBriefing] =
     useState(true);
-
 
   const [countdown, setCountdown] =
     useState(null);
@@ -147,7 +119,6 @@ function WishBottle({ onComplete }) {
   const [showReward, setShowReward] =
     useState(false);
 
-
   const [rewardPhase, setRewardPhase] =
     useState("appear");
 
@@ -159,98 +130,369 @@ function WishBottle({ onComplete }) {
   const countdownRunningRef =
     useRef(false);
 
-
   const gameRef =
     useRef(null);
-
 
   const animationRef =
     useRef(null);
 
-
   const nextStarId =
     useRef(0);
-
-
-  /*
-   * 已经生成多少颗实体星星
-   */
 
   const spawnedStarsRef =
     useRef(0);
 
-
-  /*
-   * 当前星愿收集总量
-   *
-   * 普通 +1
-   * 特别 +2
-   */
-
   const collectedStarsRef =
     useRef(0);
-
-
-  /*
-   * 当前护盾
-   */
 
   const shieldRef =
     useRef(MAX_SHIELD);
 
-
-  /*
-   * 瓶子位置
-   */
-
   const bottleXRef =
-    useRef(bottleX);
-
-
-  /*
-   * 拖动状态
-   */
+    useRef(
+      GAME_WIDTH / 2 -
+      BOTTLE_WIDTH / 2
+    );
 
   const draggingRef =
     useRef(false);
 
-
-  /*
-   * Message timer
-   */
-
   const messageTimerRef =
     useRef(null);
-
-
-  /*
-   * Countdown timers
-   */
 
   const countdownTimersRef =
     useRef([]);
 
+  const rewardTimersRef =
+    useRef([]);
 
-  /*
-   * 实际游戏中的星星
-   *
-   * React state 只负责画面
-   */
+
+  /* =======================================================
+     REAL GAME DATA
+  ======================================================= */
 
   const starsRef =
     useRef([]);
 
 
   /* =======================================================
-     UPDATE BOTTLE REF
+     STAR DOM
+  ======================================================= */
+
+  const starElementsRef =
+    useRef(new Map());
+
+  const starRefCallbacksRef =
+    useRef(new Map());
+
+
+  /* =======================================================
+     BOTTLE DOM
+  ======================================================= */
+
+  const bottleElementRef =
+    useRef(null);
+
+  const bottleStarsRef =
+    useRef([]);
+
+
+  /* =======================================================
+     HUD DOM
+  ======================================================= */
+
+  const collectedCountRef =
+    useRef(null);
+
+  const progressFillRef =
+    useRef(null);
+
+  const shieldElementsRef =
+    useRef([]);
+
+
+  /* =======================================================
+     MESSAGE DOM
+  ======================================================= */
+
+  const messageElementRef =
+    useRef(null);
+
+
+  /* =======================================================
+     GAME RECT
+  ======================================================= */
+
+  const gameRectRef =
+    useRef(null);
+
+
+  /* =======================================================
+     TIME
+  ======================================================= */
+
+  const lastTimeRef =
+    useRef(0);
+
+
+  /* =======================================================
+     BOTTLE RENDER RAF
+  ======================================================= */
+
+  const bottleRenderRef =
+    useRef(null);
+
+
+  /* =======================================================
+     CACHE GAME RECT
   ======================================================= */
 
   useEffect(() => {
 
-    bottleXRef.current =
-      bottleX;
+    function updateGameRect() {
 
-  }, [bottleX]);
+      if (!gameRef.current) {
+        return;
+      }
+
+      gameRectRef.current =
+        gameRef.current.getBoundingClientRect();
+    }
+
+
+    updateGameRect();
+
+
+    window.addEventListener(
+      "resize",
+      updateGameRect,
+      { passive: true }
+    );
+
+
+    return () => {
+
+      window.removeEventListener(
+        "resize",
+        updateGameRect
+      );
+
+    };
+
+  }, []);
+
+
+  /* =======================================================
+     INITIAL BOTTLE POSITION
+  ======================================================= */
+
+  useEffect(() => {
+
+    if (!bottleElementRef.current) {
+      return;
+    }
+
+    bottleElementRef.current.style.transform =
+      `translate3d(${bottleXRef.current}px, 0, 0)`;
+
+  }, []);
+
+
+  /* =======================================================
+     STABLE STAR DOM REF
+  ======================================================= */
+
+  function getStarRef(id) {
+
+    const cached =
+      starRefCallbacksRef.current.get(id);
+
+    if (cached) {
+      return cached;
+    }
+
+
+    const callback =
+      (element) => {
+
+        if (element) {
+
+          element.style.opacity =
+            "1";
+
+          starElementsRef.current.set(
+            id,
+            element
+          );
+
+        } else {
+
+          starElementsRef.current.delete(
+            id
+          );
+
+        }
+
+      };
+
+
+    starRefCallbacksRef.current.set(
+      id,
+      callback
+    );
+
+
+    return callback;
+  }
+
+
+  /* =======================================================
+     CLEAN STAR REF
+  ======================================================= */
+
+  function cleanupStarRef(id) {
+
+    starElementsRef.current.delete(
+      id
+    );
+
+    starRefCallbacksRef.current.delete(
+      id
+    );
+
+  }
+
+
+  /* =======================================================
+     UPDATE COLLECTION HUD DIRECTLY
+  ======================================================= */
+
+  function updateCollectedHUD(value) {
+
+    if (collectedCountRef.current) {
+
+      collectedCountRef.current.textContent =
+        `${value} / ${TOTAL_STARS}`;
+
+    }
+
+
+    if (progressFillRef.current) {
+
+      progressFillRef.current.style.width =
+        `${(value / TOTAL_STARS) * 100}%`;
+
+    }
+
+
+    /*
+      瓶子里面的星星也直接显示，
+      不触发 React render。
+    */
+
+    for (
+      let i = 0;
+      i < bottleStarsRef.current.length;
+      i++
+    ) {
+
+      const star =
+        bottleStarsRef.current[i];
+
+      if (!star) {
+        continue;
+      }
+
+      star.style.opacity =
+        i < Math.min(value, 12)
+          ? "1"
+          : "0";
+
+      star.style.transform =
+        i < Math.min(value, 12)
+          ? "scale(1)"
+          : "scale(0.7)";
+    }
+
+  }
+
+
+  /* =======================================================
+     UPDATE SHIELD DIRECTLY
+  ======================================================= */
+
+  function updateShieldHUD(value) {
+
+    for (
+      let i = 0;
+      i < shieldElementsRef.current.length;
+      i++
+    ) {
+
+      const element =
+        shieldElementsRef.current[i];
+
+      if (!element) {
+        continue;
+      }
+
+      element.className =
+        i < value
+          ? "shield active"
+          : "shield empty";
+
+    }
+
+  }
+
+
+  /* =======================================================
+     MESSAGE DIRECT DOM
+  ======================================================= */
+
+  function showMessage(
+    text,
+    duration = 700
+  ) {
+
+    const element =
+      messageElementRef.current;
+
+
+    if (!element) {
+      return;
+    }
+
+
+    if (
+      messageTimerRef.current
+    ) {
+
+      clearTimeout(
+        messageTimerRef.current
+      );
+
+    }
+
+
+    element.textContent =
+      text;
+
+    element.classList.add(
+      "wish-message-visible"
+    );
+
+
+    messageTimerRef.current =
+      setTimeout(() => {
+
+        element.classList.remove(
+          "wish-message-visible"
+        );
+
+      }, duration);
+
+  }
 
 
   /* =======================================================
@@ -267,6 +509,7 @@ function WishBottle({ onComplete }) {
     ) {
 
       return null;
+
     }
 
 
@@ -296,6 +539,7 @@ function WishBottle({ onComplete }) {
     ) {
 
       return [];
+
     }
 
 
@@ -309,9 +553,9 @@ function WishBottle({ onComplete }) {
       spawnedStarsRef.current;
 
 
-    /*
-     * DOUBLE STAR
-     */
+    /* =========================================
+       DOUBLE STAR
+    ========================================= */
 
     if (
       shouldDouble &&
@@ -341,6 +585,7 @@ function WishBottle({ onComplete }) {
 
         x1 =
           x2 - 220;
+
       }
 
 
@@ -356,12 +601,13 @@ function WishBottle({ onComplete }) {
         star1,
         star2
       ].filter(Boolean);
+
     }
 
 
-    /*
-     * SINGLE STAR
-     */
+    /* =========================================
+       SINGLE STAR
+    ========================================= */
 
     const star =
       spawnNextStar();
@@ -370,6 +616,200 @@ function WishBottle({ onComplete }) {
     return star
       ? [star]
       : [];
+
+  }
+
+
+  /* =======================================================
+     RENDER BOTTLE
+  ======================================================= */
+
+  function renderBottlePosition() {
+
+    bottleRenderRef.current =
+      null;
+
+
+    if (
+      !bottleElementRef.current
+    ) {
+
+      return;
+
+    }
+
+
+    bottleElementRef.current.style.transform =
+      `translate3d(${bottleXRef.current}px, 0, 0)`;
+
+  }
+
+
+  /* =======================================================
+     MOVE BOTTLE
+  ======================================================= */
+
+  function moveBottle(
+    clientX
+  ) {
+
+    if (!gameRef.current) {
+      return;
+    }
+
+
+    if (
+      !gameRectRef.current
+    ) {
+
+      gameRectRef.current =
+        gameRef.current.getBoundingClientRect();
+
+    }
+
+
+    const rect =
+      gameRectRef.current;
+
+
+    const scale =
+      GAME_WIDTH /
+      rect.width;
+
+
+    let newX =
+      (clientX -
+        rect.left) *
+        scale -
+      BOTTLE_WIDTH / 2;
+
+
+    newX =
+      Math.max(
+        0,
+        Math.min(
+          GAME_WIDTH -
+            BOTTLE_WIDTH,
+          newX
+        )
+      );
+
+
+    bottleXRef.current =
+      newX;
+
+
+    if (
+      !bottleRenderRef.current
+    ) {
+
+      bottleRenderRef.current =
+        requestAnimationFrame(
+          renderBottlePosition
+        );
+
+    }
+
+  }
+
+
+  /* =======================================================
+     POINTER DOWN
+  ======================================================= */
+
+  function handlePointerDown(e) {
+
+    if (
+      !showBriefing &&
+      countdown === null &&
+      !gameOver &&
+      !completed
+    ) {
+
+      e.preventDefault();
+
+
+      draggingRef.current =
+        true;
+
+
+      setDragging(true);
+
+
+      if (gameRef.current) {
+
+        gameRectRef.current =
+          gameRef.current.getBoundingClientRect();
+
+      }
+
+
+      try {
+
+        e.currentTarget
+          .setPointerCapture(
+            e.pointerId
+          );
+
+      } catch {}
+
+
+      moveBottle(
+        e.clientX
+      );
+
+    }
+
+  }
+
+
+  /* =======================================================
+     POINTER MOVE
+  ======================================================= */
+
+  function handlePointerMove(e) {
+
+    if (
+      !draggingRef.current
+    ) {
+
+      return;
+
+    }
+
+
+    e.preventDefault();
+
+
+    moveBottle(
+      e.clientX
+    );
+
+  }
+
+
+  /* =======================================================
+     POINTER UP
+  ======================================================= */
+
+  function handlePointerUp(e) {
+
+    draggingRef.current =
+      false;
+
+
+    setDragging(false);
+
+
+    try {
+
+      e.currentTarget
+        .releasePointerCapture(
+          e.pointerId
+        );
+
+    } catch {}
+
   }
 
 
@@ -384,6 +824,7 @@ function WishBottle({ onComplete }) {
     ) {
 
       return;
+
     }
 
 
@@ -433,7 +874,6 @@ function WishBottle({ onComplete }) {
 
         setCountdown(null);
 
-
         countdownRunningRef.current =
           false;
 
@@ -451,6 +891,9 @@ function WishBottle({ onComplete }) {
         );
 
 
+        lastTimeRef.current =
+          performance.now();
+
       }, 3500);
 
 
@@ -460,6 +903,7 @@ function WishBottle({ onComplete }) {
       timer3,
       timer4
     ];
+
   }
 
 
@@ -477,9 +921,23 @@ function WishBottle({ onComplete }) {
         animationRef.current
       );
 
-
       animationRef.current =
         null;
+
+    }
+
+
+    if (
+      bottleRenderRef.current
+    ) {
+
+      cancelAnimationFrame(
+        bottleRenderRef.current
+      );
+
+      bottleRenderRef.current =
+        null;
+
     }
 
 
@@ -515,6 +973,15 @@ function WishBottle({ onComplete }) {
       [];
 
 
+    starElementsRef.current.clear();
+
+    starRefCallbacksRef.current.clear();
+
+
+    lastTimeRef.current =
+      0;
+
+
     setStars([]);
 
 
@@ -523,18 +990,43 @@ function WishBottle({ onComplete }) {
       BOTTLE_WIDTH / 2;
 
 
-    setBottleX(
-      centerX
-    );
-
-
     bottleXRef.current =
       centerX;
 
 
-    setCollectedStars(0);
+    if (
+      bottleElementRef.current
+    ) {
 
-    setShield(MAX_SHIELD);
+      bottleElementRef.current.style.transform =
+        `translate3d(${centerX}px, 0, 0)`;
+
+    }
+
+
+    /* RESET HUD DIRECTLY */
+
+    updateCollectedHUD(0);
+
+    updateShieldHUD(
+      MAX_SHIELD
+    );
+
+
+    /* RESET MESSAGE */
+
+    if (
+      messageElementRef.current
+    ) {
+
+      messageElementRef.current
+        .classList
+        .remove(
+          "wish-message-visible"
+        );
+
+    }
+
 
     setGameOver(false);
 
@@ -544,8 +1036,6 @@ function WishBottle({ onComplete }) {
 
     setRewardPhase("appear");
 
-    setMessage("");
-
     setDragging(false);
 
     draggingRef.current =
@@ -554,214 +1044,7 @@ function WishBottle({ onComplete }) {
     setCountdown(null);
 
     setShowBriefing(true);
-  }
 
-
-  /* =======================================================
-     CLEANUP
-  ======================================================= */
-
-  useEffect(() => {
-
-    return () => {
-
-      if (
-        animationRef.current
-      ) {
-
-        cancelAnimationFrame(
-          animationRef.current
-        );
-      }
-
-
-      if (
-        messageTimerRef.current
-      ) {
-
-        clearTimeout(
-          messageTimerRef.current
-        );
-      }
-
-
-      countdownTimersRef.current
-        .forEach(clearTimeout);
-
-    };
-
-  }, []);
-
-
-  /* =======================================================
-     MESSAGE
-  ======================================================= */
-
-  function showMessage(
-    text,
-    duration = 700
-  ) {
-
-    setMessage(text);
-
-
-    if (
-      messageTimerRef.current
-    ) {
-
-      clearTimeout(
-        messageTimerRef.current
-      );
-    }
-
-
-    messageTimerRef.current =
-      setTimeout(() => {
-
-        setMessage("");
-
-      }, duration);
-  }
-
-
-  /* =======================================================
-     MOVE BOTTLE
-  ======================================================= */
-
-  function moveBottle(
-    clientX
-  ) {
-
-    if (
-      !gameRef.current
-    ) {
-
-      return;
-    }
-
-
-    const rect =
-      gameRef.current
-        .getBoundingClientRect();
-
-
-    const scale =
-      GAME_WIDTH /
-      rect.width;
-
-
-    let newX =
-      (clientX -
-        rect.left) *
-        scale -
-      BOTTLE_WIDTH / 2;
-
-
-    newX =
-      Math.max(
-        0,
-        Math.min(
-          GAME_WIDTH -
-            BOTTLE_WIDTH,
-          newX
-        )
-      );
-
-
-    bottleXRef.current =
-      newX;
-
-
-    setBottleX(
-      newX
-    );
-  }
-
-
-  /* =======================================================
-     POINTER DOWN
-  ======================================================= */
-
-  function handlePointerDown(e) {
-
-    if (
-      !showBriefing &&
-      countdown === null &&
-      !gameOver &&
-      !completed
-    ) {
-
-      e.preventDefault();
-
-
-      draggingRef.current =
-        true;
-
-
-      setDragging(true);
-
-
-      try {
-
-        e.currentTarget
-          .setPointerCapture(
-            e.pointerId
-          );
-
-      } catch {}
-
-
-      moveBottle(
-        e.clientX
-      );
-    }
-  }
-
-
-  /* =======================================================
-     POINTER MOVE
-  ======================================================= */
-
-  function handlePointerMove(e) {
-
-    if (
-      !draggingRef.current
-    ) {
-
-      return;
-    }
-
-
-    e.preventDefault();
-
-
-    moveBottle(
-      e.clientX
-    );
-  }
-
-
-  /* =======================================================
-     POINTER UP
-  ======================================================= */
-
-  function handlePointerUp(e) {
-
-    draggingRef.current =
-      false;
-
-
-    setDragging(false);
-
-
-    try {
-
-      e.currentTarget
-        .releasePointerCapture(
-          e.pointerId
-        );
-
-    } catch {}
   }
 
 
@@ -779,18 +1062,39 @@ function WishBottle({ onComplete }) {
     ) {
 
       return;
+
     }
 
 
-    function gameLoop() {
+    lastTimeRef.current =
+      performance.now();
+
+
+    function gameLoop(timestamp) {
+
+      const delta =
+        Math.min(
+          timestamp -
+            lastTimeRef.current,
+          32
+        );
+
+
+      lastTimeRef.current =
+        timestamp;
+
+
+      const timeScale =
+        delta / 16.67;
+
 
       const currentStars =
         starsRef.current;
 
 
-      /* ===================================================
+      /* =================================================
          NO ACTIVE STAR
-      =================================================== */
+      ================================================= */
 
       if (
         currentStars.length === 0
@@ -809,9 +1113,15 @@ function WishBottle({ onComplete }) {
             nextWave;
 
 
+          /*
+            只有生成新星星时
+            才触发 React render。
+          */
+
           setStars(
             nextWave
           );
+
         }
 
 
@@ -822,15 +1132,40 @@ function WishBottle({ onComplete }) {
 
 
         return;
+
       }
 
 
       const updatedStars = [];
 
 
-      /* ===================================================
+      /* =================================================
+         BOTTLE COLLISION AREA
+      ================================================= */
+
+      const bottleLeft =
+        bottleXRef.current;
+
+
+      const bottleRight =
+        bottleXRef.current +
+        BOTTLE_WIDTH;
+
+
+      const bottleTop =
+        GAME_HEIGHT -
+        BOTTLE_HEIGHT -
+        10;
+
+
+      const bottleBottom =
+        GAME_HEIGHT -
+        10;
+
+
+      /* =================================================
          PROCESS EACH STAR
-      =================================================== */
+      ================================================= */
 
       for (
         let i = 0;
@@ -842,54 +1177,54 @@ function WishBottle({ onComplete }) {
           currentStars[i];
 
 
+        /* =========================================
+           MOVEMENT
+        ========================================= */
+
         const nextY =
           star.y +
-          star.speed;
+          star.speed *
+          timeScale;
 
 
         const nextX =
           star.x +
-          star.drift;
+          star.drift *
+          timeScale;
 
 
-        const bottleLeft =
-          bottleXRef.current;
+        const nextRotation =
+          star.rotation +
+          star.rotationSpeed *
+          timeScale;
 
 
-        const bottleRight =
-          bottleXRef.current +
-          BOTTLE_WIDTH;
+        /* =========================================
+           HITBOX
+        ========================================= */
 
-
-        const bottleTop =
-          GAME_HEIGHT -
-          BOTTLE_HEIGHT -
-          10;
-
-
-        const bottleBottom =
-          GAME_HEIGHT -
-          10;
+        const halfSize =
+          star.size / 2;
 
 
         const starLeft =
           nextX -
-          star.size / 2;
+          halfSize;
 
 
         const starRight =
           nextX +
-          star.size / 2;
+          halfSize;
 
 
         const starTop =
           nextY -
-          star.size / 2;
+          halfSize;
 
 
         const starBottom =
           nextY +
-          star.size / 2;
+          halfSize;
 
 
         const hitBottle =
@@ -909,16 +1244,19 @@ function WishBottle({ onComplete }) {
 
         if (hitBottle) {
 
-          /*
-           * ================================================
-           * 星愿收集
-           *
-           * 普通星星 = +1
-           * 特别星星 = +2
-           *
-           * 这就是唯一的收集分数
-           * ================================================
-           */
+          const element =
+            starElementsRef.current.get(
+              star.id
+            );
+
+
+          if (element) {
+
+            element.style.opacity =
+              "0";
+
+          }
+
 
           const collectedGain =
             star.type === "special"
@@ -935,16 +1273,22 @@ function WishBottle({ onComplete }) {
             newCollected;
 
 
-          setCollectedStars(
+          /*
+            =========================================
+            IMPORTANT
+
+            不再：
+
+              setCollectedStars()
+
+            所以这里不会触发 React render。
+            =========================================
+          */
+
+          updateCollectedHUD(
             newCollected
           );
 
-
-          /*
-           * ================================================
-           * MESSAGE
-           * ================================================
-           */
 
           if (
             star.type === "special"
@@ -961,14 +1305,18 @@ function WishBottle({ onComplete }) {
               "✦ 星愿 +1",
               750
             );
+
           }
 
 
-          /*
-           * ================================================
-           * COMPLETE
-           * ================================================
-           */
+          cleanupStarRef(
+            star.id
+          );
+
+
+          /* =========================================
+             COMPLETE
+          ========================================= */
 
           if (
             newCollected >=
@@ -978,20 +1326,20 @@ function WishBottle({ onComplete }) {
             starsRef.current =
               [];
 
+
             setStars([]);
+
 
             setCompleted(true);
 
+
             return;
+
           }
 
 
-          /*
-           * 当前星星已经收集
-           * 不加入 updatedStars
-           */
-
           continue;
+
         }
 
 
@@ -1004,28 +1352,68 @@ function WishBottle({ onComplete }) {
           GAME_HEIGHT + 60
         ) {
 
-          updatedStars.push({
+          const updatedStar = {
 
             ...star,
 
-            x: nextX,
+            x:
+              nextX,
 
-            y: nextY,
+            y:
+              nextY,
 
             rotation:
-              star.rotation +
-              star.rotationSpeed
+              nextRotation
 
-          });
+          };
+
+
+          updatedStars.push(
+            updatedStar
+          );
+
+
+          const element =
+            starElementsRef.current.get(
+              star.id
+            );
+
+
+          if (element) {
+
+            element.style.transform =
+              `translate3d(${nextX}px, ${nextY}px, 0) translate(-50%, -50%) rotate(${nextRotation}deg)`;
+
+          }
 
 
           continue;
+
         }
 
 
         /* =================================================
            MISSED
         ================================================= */
+
+        const element =
+          starElementsRef.current.get(
+            star.id
+          );
+
+
+        if (element) {
+
+          element.style.opacity =
+            "0";
+
+        }
+
+
+        cleanupStarRef(
+          star.id
+        );
+
 
         const newShield =
           Math.max(
@@ -1038,7 +1426,12 @@ function WishBottle({ onComplete }) {
           newShield;
 
 
-        setShield(
+        /*
+          不再 setShield()
+          直接更新 HUD。
+        */
+
+        updateShieldHUD(
           newShield
         );
 
@@ -1056,32 +1449,33 @@ function WishBottle({ onComplete }) {
           starsRef.current =
             [];
 
+
           setStars([]);
+
 
           setGameOver(true);
 
+
           return;
+
         }
+
       }
 
 
-      /* ===================================================
-         SAVE STARS
-      =================================================== */
+      /* =================================================
+         SAVE PHYSICS
+      ================================================= */
 
       starsRef.current =
         updatedStars;
-
-
-      setStars(
-        updatedStars
-      );
 
 
       animationRef.current =
         requestAnimationFrame(
           gameLoop
         );
+
     }
 
 
@@ -1104,6 +1498,7 @@ function WishBottle({ onComplete }) {
 
         animationRef.current =
           null;
+
       }
 
     };
@@ -1118,30 +1513,118 @@ function WishBottle({ onComplete }) {
 
   /* =======================================================
      SECOND STAR REWARD
-     通关后先显示提示板，点击按钮才进入黄色星星动画
   ======================================================= */
 
   function startReward() {
 
-    if (showReward) return;
+    if (showReward) {
+      return;
+    }
+
+
+    rewardTimersRef.current
+      .forEach(clearTimeout);
+
+
+    rewardTimersRef.current =
+      [];
+
 
     setShowReward(true);
+
     setRewardPhase("appear");
 
-    setTimeout(() => {
-      setRewardPhase("glow");
-    }, 700);
 
-    setTimeout(() => {
-      setRewardPhase("burst");
-    }, 1700);
+    const glowTimer =
+      setTimeout(() => {
 
-    setTimeout(() => {
-      if (onComplete) {
-        onComplete();
-      }
-    }, REWARD_DURATION);
+        setRewardPhase(
+          "glow"
+        );
+
+      }, 700);
+
+
+    const burstTimer =
+      setTimeout(() => {
+
+        setRewardPhase(
+          "burst"
+        );
+
+      }, 1700);
+
+
+    const completeTimer =
+      setTimeout(() => {
+
+        if (onComplete) {
+          onComplete();
+        }
+
+      }, REWARD_DURATION);
+
+
+    rewardTimersRef.current = [
+      glowTimer,
+      burstTimer,
+      completeTimer
+    ];
+
   }
+
+
+  /* =======================================================
+     CLEANUP
+  ======================================================= */
+
+  useEffect(() => {
+
+    return () => {
+
+      if (
+        animationRef.current
+      ) {
+
+        cancelAnimationFrame(
+          animationRef.current
+        );
+
+      }
+
+
+      if (
+        bottleRenderRef.current
+      ) {
+
+        cancelAnimationFrame(
+          bottleRenderRef.current
+        );
+
+      }
+
+
+      if (
+        messageTimerRef.current
+      ) {
+
+        clearTimeout(
+          messageTimerRef.current
+        );
+
+      }
+
+
+      countdownTimersRef.current
+        .forEach(clearTimeout);
+
+
+      rewardTimersRef.current
+        .forEach(clearTimeout);
+
+    };
+
+  }, []);
 
 
   /* =======================================================
@@ -1149,6 +1632,7 @@ function WishBottle({ onComplete }) {
   ======================================================= */
 
   return (
+
     <div className="wish-bottle-page">
 
       <StarBackground />
@@ -1162,9 +1646,6 @@ function WishBottle({ onComplete }) {
         ================================================= */}
 
         <div className="wish-hud">
-
-
-          {/* SHIELD */}
 
           <div className="shield-display">
 
@@ -1183,11 +1664,13 @@ function WishBottle({ onComplete }) {
 
                   <span
                     key={index}
-                    className={
-                      index < shield
-                        ? "shield active"
-                        : "shield empty"
-                    }
+                    ref={(element) => {
+
+                      shieldElementsRef.current[index] =
+                        element;
+
+                    }}
+                    className="shield active"
                   >
                     ✦
                   </span>
@@ -1200,8 +1683,6 @@ function WishBottle({ onComplete }) {
           </div>
 
 
-          {/* STAR COLLECTION */}
-
           <div className="energy-display">
 
             <span>
@@ -1209,24 +1690,20 @@ function WishBottle({ onComplete }) {
             </span>
 
 
-            <strong>
-              {collectedStars} /{" "}
-              {TOTAL_STARS}
+            <strong
+              ref={collectedCountRef}
+            >
+              0 / {TOTAL_STARS}
             </strong>
 
 
             <div className="wish-progress">
 
               <div
+                ref={progressFillRef}
                 className="wish-progress-fill"
                 style={{
-                  width:
-                    `${
-                      (
-                        collectedStars /
-                        TOTAL_STARS
-                      ) * 100
-                    }%`
+                  width: "0%"
                 }}
               />
 
@@ -1246,7 +1723,6 @@ function WishBottle({ onComplete }) {
           ref={gameRef}
         >
 
-
           {/* FALLING STARS */}
 
           {stars.map(
@@ -1254,6 +1730,13 @@ function WishBottle({ onComplete }) {
 
               <div
                 key={star.id}
+
+                ref={
+                  getStarRef(
+                    star.id
+                  )
+                }
+
                 className={
                   `falling-star ${
                     star.type ===
@@ -1262,12 +1745,21 @@ function WishBottle({ onComplete }) {
                       : ""
                   }`
                 }
+
                 style={{
-                  left: star.x,
-                  top: star.y,
-                  fontSize: star.size,
+                  left: 0,
+                  top: 0,
+
+                  fontSize:
+                    star.size,
+
+                  opacity: 1,
+
                   transform:
-                    `translate(-50%, -50%) rotate(${star.rotation}deg)`
+                    `translate3d(${star.x}px, ${star.y}px, 0) translate(-50%, -50%) rotate(${star.rotation}deg)`,
+
+                  willChange:
+                    "transform"
                 }}
               >
                 ✦
@@ -1282,6 +1774,7 @@ function WishBottle({ onComplete }) {
           ================================================= */}
 
           <div
+            ref={bottleElementRef}
             className={
               `wish-bottle ${
                 dragging
@@ -1290,17 +1783,27 @@ function WishBottle({ onComplete }) {
               }`
             }
             style={{
-              left: bottleX
+              left: 0,
+
+              transform:
+                `translate3d(${GAME_WIDTH / 2 - BOTTLE_WIDTH / 2}px, 0, 0)`,
+
+              willChange:
+                "transform"
             }}
+
             onPointerDown={
               handlePointerDown
             }
+
             onPointerMove={
               handlePointerMove
             }
+
             onPointerUp={
               handlePointerUp
             }
+
             onPointerCancel={
               handlePointerUp
             }
@@ -1317,16 +1820,25 @@ function WishBottle({ onComplete }) {
               <div className="bottle-stars">
 
                 {Array.from({
-                  length:
-                    Math.min(
-                      collectedStars,
-                      12
-                    )
+                  length: 12
                 }).map(
                   (_, index) => (
 
                     <span
                       key={index}
+                      ref={(element) => {
+
+                        bottleStarsRef.current[index] =
+                          element;
+
+                      }}
+                      style={{
+                        opacity:
+                          0,
+
+                        transform:
+                          "scale(0.7)"
+                      }}
                     >
                       ✦
                     </span>
@@ -1341,15 +1853,17 @@ function WishBottle({ onComplete }) {
           </div>
 
 
-          {/* MESSAGE */}
+          {/* =================================================
+              MESSAGE
 
-          {message && (
+              永远存在，不再通过 React
+              conditional render 创建 / 删除。
+          ================================================= */}
 
-            <div className="wish-message">
-              {message}
-            </div>
-
-          )}
+          <div
+            ref={messageElementRef}
+            className="wish-message"
+          ></div>
 
 
           {/* =================================================
@@ -1399,7 +1913,6 @@ function WishBottle({ onComplete }) {
 
                 <div className="intro-rules">
 
-
                   <div className="intro-rule">
 
                     <span className="rule-icon">
@@ -1437,7 +1950,6 @@ function WishBottle({ onComplete }) {
                     </span>
 
                   </div>
-
 
                 </div>
 
@@ -1589,67 +2101,68 @@ function WishBottle({ onComplete }) {
               COMPLETE
           ================================================= */}
 
-          {completed && !showReward && (
+          {completed &&
+            !showReward && (
 
-            <div className="wish-overlay">
+              <div className="wish-overlay">
 
-              <div className="wish-result">
+                <div className="wish-result">
 
-                <p className="result-tag">
-                  WISH COMPLETE
-                </p>
+                  <p className="result-tag">
+                    WISH COMPLETE
+                  </p>
 
 
-                <div className="result-symbol success">
-                  ✦
+                  <div className="result-symbol success">
+                    ✦
+                  </div>
+
+
+                  <h2>
+                    星愿收集完成
+                  </h2>
+
+
+                  <p>
+                    27 颗星愿，
+                    <br />
+                    都已经被好好收藏。
+                  </p>
+
+
+                  <div className="completion-stars">
+                    ✦ ✧ ✦ ✧ ✦
+                  </div>
+
+
+                  <p className="progress-text">
+                    星愿完成度
+                    <br />
+
+                    <strong>
+                      100%
+                    </strong>
+
+                  </p>
+
+
+                  {onComplete && (
+
+                    <button
+                      onClick={
+                        startReward
+                      }
+                    >
+                      获得第二颗星星
+                    </button>
+
+                  )}
+
                 </div>
-
-
-                <h2>
-                  星愿收集完成
-                </h2>
-
-
-                <p>
-                  27 颗星愿，
-                  <br />
-                  都已经被好好收藏。
-                </p>
-
-
-                <div className="completion-stars">
-                  ✦ ✧ ✦ ✧ ✦
-                </div>
-
-
-                <p className="progress-text">
-                  星愿完成度
-                  <br />
-
-                  <strong>
-                    100%
-                  </strong>
-
-                </p>
-
-
-                {onComplete && (
-
-                  <button
-                    onClick={
-                      startReward
-                    }
-                  >
-                    获得第二颗星星
-                  </button>
-
-                )}
 
               </div>
 
-            </div>
-
-          )}
+            )}
 
         </div>
 
@@ -1661,42 +2174,81 @@ function WishBottle({ onComplete }) {
         {showReward && (
 
           <div
-            className={`wish-reward-overlay wish-reward-${rewardPhase}`}
+            className={`
+              wish-reward-overlay
+              wish-reward-${rewardPhase}
+            `}
           >
 
             <div className="wish-reward-particle-field">
-              {Array.from({ length: 28 }).map((_, index) => (
-                <span
-                  key={index}
-                  className="wish-reward-particle"
-                  style={{ "--i": index }}
-                >
-                  ✦
-                </span>
-              ))}
+
+              {Array.from({
+                length: 28
+              }).map(
+                (_, index) => (
+
+                  <span
+                    key={index}
+                    className="wish-reward-particle"
+                    style={{
+                      "--i": index
+                    }}
+                  >
+                    ✦
+                  </span>
+
+                )
+              )}
+
             </div>
+
 
             <div className="wish-reward-rings">
+
               <div className="wish-reward-ring wish-ring-one"></div>
+
               <div className="wish-reward-ring wish-ring-two"></div>
+
               <div className="wish-reward-ring wish-ring-three"></div>
+
             </div>
+
 
             <div className="wish-reward-yellow-star">
+
               <div className="wish-reward-star-halo"></div>
+
               <div className="wish-reward-star-rays"></div>
-              <div className="wish-reward-star-core">★</div>
-              <div className="wish-reward-star-shine">✦</div>
+
+              <div className="wish-reward-star-core">
+                ★
+              </div>
+
+              <div className="wish-reward-star-shine">
+                ✦
+              </div>
+
             </div>
 
+
             <div className="wish-reward-text">
-              <div className="wish-reward-small-text">第二颗星愿</div>
-              <h2>黄色星星已获得</h2>
+
+              <div className="wish-reward-small-text">
+                第二颗星愿
+              </div>
+
+              <h2>
+                黄色星星已获得
+              </h2>
+
               <p>
-                一份星海能量，<br />
+                一份星海能量，
+                <br />
                 正在你的旅途中亮起。
               </p>
+
             </div>
+
 
             <div className="wish-reward-flash"></div>
 
@@ -1714,6 +2266,7 @@ function WishBottle({ onComplete }) {
       </div>
 
     </div>
+
   );
 }
 

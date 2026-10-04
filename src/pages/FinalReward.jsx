@@ -14,25 +14,51 @@ function ParticleField({ active = true }) {
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    let frame;
+    if (!ctx) return;
+
+    let frame = 0;
     let particles = [];
 
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const clear = () => {
+      ctx.clearRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+      );
+    };
 
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
+    if (!active) {
+      clear();
+      return undefined;
+    }
+
+    const resize = () => {
+      const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        1.5
+      );
+
+      canvas.width = Math.max(
+        1,
+        Math.floor(window.innerWidth * dpr)
+      );
+      canvas.height = Math.max(
+        1,
+        Math.floor(window.innerHeight * dpr)
+      );
+
       canvas.style.width = `${window.innerWidth}px`;
       canvas.style.height = `${window.innerHeight}px`;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      particles = Array.from({ length: 170 }, () => ({
+      particles = Array.from({ length: 150 }, () => ({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        r: Math.random() * 1.7 + 0.25,
-        a: Math.random() * 0.65 + 0.12,
-        s: Math.random() * 0.25 + 0.035,
+        r: Math.random() * 1.5 + 0.25,
+        a: Math.random() * 0.62 + 0.12,
+        s: Math.random() * 0.22 + 0.035,
         tw: Math.random() * Math.PI * 2,
       }));
     };
@@ -45,7 +71,7 @@ function ParticleField({ active = true }) {
         window.innerHeight
       );
 
-      particles.forEach((p) => {
+      for (const p of particles) {
         p.tw += 0.018;
         p.y -= p.s;
 
@@ -58,11 +84,17 @@ function ParticleField({ active = true }) {
           p.a * (0.72 + Math.sin(p.tw) * 0.28);
 
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.arc(
+          p.x,
+          p.y,
+          p.r,
+          0,
+          Math.PI * 2
+        );
 
         ctx.fillStyle = `rgba(190, 232, 255, ${alpha})`;
         ctx.fill();
-      });
+      }
 
       frame = requestAnimationFrame(draw);
     };
@@ -75,7 +107,7 @@ function ParticleField({ active = true }) {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [active]);
 
   return (
     <canvas
@@ -183,27 +215,123 @@ function BirthdayLetter({ onBack }) {
    VIDEO
    ========================================================= */
 
+function waitForVideoBuffer(
+  video,
+  minimumSeconds = 1.25,
+  timeoutMs = 2200
+) {
+  return new Promise((resolve) => {
+    const startedAt = performance.now();
+
+    const check = () => {
+      if (!video) {
+        resolve();
+        return;
+      }
+
+      const readyEnough =
+        video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA;
+
+      let bufferedEnough = false;
+
+      try {
+        if (video.buffered.length > 0) {
+          const last = video.buffered.length - 1;
+          const bufferedUntil = video.buffered.end(last);
+
+          bufferedEnough =
+            bufferedUntil - video.currentTime >=
+            minimumSeconds;
+        }
+      } catch {}
+
+      if (readyEnough && bufferedEnough) {
+        resolve();
+        return;
+      }
+
+      if (performance.now() - startedAt >= timeoutMs) {
+        resolve();
+        return;
+      }
+
+      window.setTimeout(check, 100);
+    };
+
+    check();
+  });
+}
+
 function MemoryVideo({ onBack, onEnded }) {
   const videoRef = useRef(null);
   const [muted, setMuted] = useState(false);
+  const [buffering, setBuffering] = useState(true);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    /*
+     * Tell the AudioManager to hard-pause the current BGM.
+     * This pauses ending.wav itself instead of trying to hunt for
+     * detached `new Audio()` elements from the DOM.
+     */
+    window.dispatchEvent(
+      new CustomEvent("birthday-video-start")
+    );
 
-    video.currentTime = 0;
+    return () => {
+      /*
+       * Resume the exact BGM track that was playing before the video.
+       */
+      window.dispatchEvent(
+        new CustomEvent("birthday-video-end")
+      );
+    };
+  }, []);
 
-    const playPromise = video.play();
+  useEffect(() => {
+    let cancelled = false;
 
-    if (playPromise?.catch) {
-      playPromise.catch(() => {
-        setMuted(true);
+    const startVideo = async () => {
+      const video = videoRef.current;
+      if (!video) return;
 
-        video.muted = true;
+      try {
+        video.currentTime = 0;
 
-        video.play().catch(() => {});
-      });
-    }
+        await waitForVideoBuffer(
+          video,
+          1.25,
+          2200
+        );
+
+        if (cancelled) return;
+
+        await video.play();
+        setBuffering(false);
+      } catch (error) {
+        if (cancelled) return;
+
+        console.warn(
+          "Birthday video autoplay retry:",
+          error
+        );
+
+        try {
+          video.muted = true;
+          setMuted(true);
+          await video.play();
+        } catch {}
+
+        if (!cancelled) {
+          setBuffering(false);
+        }
+      }
+    };
+
+    startVideo();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -228,9 +356,13 @@ function MemoryVideo({ onBack, onEnded }) {
             playsInline
             controls
             autoPlay
-            preload="metadata"
+            preload="auto"
+            onCanPlay={() => setBuffering(false)}
+            onPlaying={() => setBuffering(false)}
+            onWaiting={() => setBuffering(true)}
             onEnded={onEnded}
             onError={(event) => {
+              setBuffering(false);
               console.error(
                 "Birthday video failed to load:",
                 event.currentTarget.error
@@ -244,6 +376,18 @@ function MemoryVideo({ onBack, onEnded }) {
 
             你的浏览器暂时无法播放这个影片。
           </video>
+
+          {buffering && (
+            <div
+              className="memory-video-loading"
+              aria-live="polite"
+            >
+              <span className="memory-video-loading-star">
+                ✦
+              </span>
+              <span>星光正在加载……</span>
+            </div>
+          )}
 
           <div className="video-corner video-corner-tl" />
           <div className="video-corner video-corner-tr" />
@@ -424,6 +568,7 @@ function FinalBlessing({ onComplete }) {
 export default function FinalReward() {
   const [phase, setPhase] = useState("awakening");
   const [reward, setReward] = useState(null);
+  const videoPreloadRef = useRef(null);
 
   /*
     awakening
@@ -469,22 +614,110 @@ export default function FinalReward() {
     return () => clearTimeout(timer);
   }, [phase]);
 
+  /* =====================================================
+     EARLY VIDEO PRELOAD
+     ===================================================== */
+
   useEffect(() => {
-    if (reward) {
-      document.body.classList.add(
-        "final-reward-open"
-      );
-    } else {
-      document.body.classList.remove(
-        "final-reward-open"
-      );
+    if (phase !== "ready") return;
+    if (typeof document === "undefined") return;
+
+    const preloadVideo = document.createElement("video");
+    const videoOrigin = new URL(VIDEO_SRC).origin;
+
+    let createdPreconnect = null;
+
+    const existingPreconnect = document.head.querySelector(
+      `link[rel="preconnect"][href="${videoOrigin}"]`
+    );
+
+    if (!existingPreconnect) {
+      createdPreconnect = document.createElement("link");
+      createdPreconnect.rel = "preconnect";
+      createdPreconnect.href = videoOrigin;
+      createdPreconnect.crossOrigin = "anonymous";
+      document.head.appendChild(createdPreconnect);
     }
 
-    return () =>
+    preloadVideo.preload = "auto";
+    preloadVideo.muted = true;
+    preloadVideo.playsInline = true;
+    preloadVideo.src = VIDEO_SRC;
+
+    try {
+      preloadVideo.setAttribute("fetchpriority", "high");
+    } catch {}
+
+    videoPreloadRef.current = preloadVideo;
+    preloadVideo.load();
+
+    return () => {
+      if (videoPreloadRef.current !== preloadVideo) {
+        return;
+      }
+
+      try {
+        preloadVideo.pause();
+      } catch {}
+
+      preloadVideo.removeAttribute("src");
+      preloadVideo.load();
+
+      if (createdPreconnect?.parentNode) {
+        createdPreconnect.parentNode.removeChild(
+          createdPreconnect
+        );
+      }
+
+      videoPreloadRef.current = null;
+    };
+  }, [phase]);
+
+  /* =====================================================
+     FULLSCREEN / BODY SCROLL LOCK
+     ===================================================== */
+
+  useEffect(() => {
+    document.documentElement.classList.add(
+      "final-reward-lock"
+    );
+
+    document.body.classList.add(
+      "final-reward-open"
+    );
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    const previousHeight =
+      document.body.style.height;
+
+    const previousWidth =
+      document.body.style.width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    document.body.style.width = "100%";
+
+    return () => {
+      document.documentElement.classList.remove(
+        "final-reward-lock"
+      );
+
       document.body.classList.remove(
         "final-reward-open"
       );
-  }, [reward]);
+
+      document.body.style.overflow =
+        previousOverflow;
+
+      document.body.style.height =
+        previousHeight;
+
+      document.body.style.width =
+        previousWidth;
+    };
+  }, []);
 
   const openReward = (type) => {
     setReward(type);
@@ -519,7 +752,7 @@ export default function FinalReward() {
     <main
       className={`final-reward ${phase} ${
         reward ? "reward-open" : ""
-      }`}
+      } ${reward === "video" ? "video-open" : ""}`}
     >
       <ParticleField
         active={!reward}
@@ -549,9 +782,6 @@ export default function FinalReward() {
             ✦
           </div>
 
-          <div className="energy-stars energy-stars-d">
-            ✦
-          </div>
 
           <EnergyCore
             pulse={phase === "fracture"}

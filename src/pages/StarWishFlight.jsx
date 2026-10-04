@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import "../styles/StarWishFlight.css";
 import StarBackground from "../components/StarBackground";
 
-
 /* =========================================================
    GAME SETTINGS
 ========================================================= */
@@ -24,13 +23,11 @@ const JUMP_FORCE = -8.4;
 
 const WIN_SCORE = 10;
 
-
 /* =========================================================
    REWARD SETTINGS
 ========================================================= */
 
 const REWARD_DURATION = 3200;
-
 
 /* =========================================================
    RANDOM GAP
@@ -39,7 +36,6 @@ const REWARD_DURATION = 3200;
 function randomGap() {
   return 120 + Math.random() * 190;
 }
-
 
 /* =========================================================
    PARTICLE
@@ -57,7 +53,6 @@ function createParticle(x, y) {
   };
 }
 
-
 /* =========================================================
    COMPONENT
 ========================================================= */
@@ -74,37 +69,44 @@ export default function StarWishFlight({ onComplete }) {
 
   const [gameOver, setGameOver] = useState(false);
 
-  const [birdY, setBirdY] = useState(250);
-
-  const [pipeX, setPipeX] =
-    useState(GAME_WIDTH);
-
-  const [gapY, setGapY] =
-    useState(randomGap());
-
   const [score, setScore] = useState(0);
 
-  const [particles, setParticles] =
-    useState([]);
-
+  const [gapY, setGapY] = useState(randomGap());
 
   /* =========================================
      REWARD STATE
   ========================================= */
 
-  const [showReward, setShowReward] =
-    useState(false);
-
+  const [showReward, setShowReward] = useState(false);
 
   const [rewardPhase, setRewardPhase] =
     useState("appear");
 
-
   /* =========================================
-     REFS
+     DOM REFS
+     
+     这些会直接控制画面位置，
+     避免每一帧触发 React render。
   ========================================= */
 
-  const velocity = useRef(0);
+  const starElementRef =
+    useRef(null);
+
+  const pipeTopElementRef =
+    useRef(null);
+
+  const pipeBottomElementRef =
+    useRef(null);
+
+  const particleContainerRef =
+    useRef(null);
+
+  /* =========================================
+     GAME REFS
+  ========================================= */
+
+  const velocity =
+    useRef(0);
 
   const animationFrame =
     useRef(null);
@@ -113,6 +115,9 @@ export default function StarWishFlight({ onComplete }) {
     useRef(false);
 
   const completed =
+    useRef(false);
+
+  const gameOverRef =
     useRef(false);
 
   const birdYRef =
@@ -127,15 +132,139 @@ export default function StarWishFlight({ onComplete }) {
   const scoreRef =
     useRef(0);
 
-  const gameOverRef =
-    useRef(false);
-
   const particlesRef =
     useRef([]);
 
   const lastTimeRef =
     useRef(0);
 
+  /* =========================================
+     PERFORMANCE REFS
+  ========================================= */
+
+  // 粒子不需要 60FPS 更新
+  const particleFrameRef =
+    useRef(0);
+
+  // 防止 reward timer 重复
+  const rewardTimersRef =
+    useRef([]);
+
+  /* =========================================
+     DIRECT DOM UPDATE
+  ========================================= */
+
+  function updateStarPosition(y) {
+
+    const element =
+      starElementRef.current;
+
+    if (!element) return;
+
+    element.style.transform =
+      `translate3d(0, ${y}px, 0) rotate(${Math.max(
+        -30,
+        Math.min(velocity.current * 5, 60)
+      )}deg)`;
+  }
+
+  function updatePipePosition(x) {
+
+    const top =
+      pipeTopElementRef.current;
+
+    const bottom =
+      pipeBottomElementRef.current;
+
+    if (top) {
+      top.style.transform =
+        `translate3d(${x}px, 0, 0)`;
+    }
+
+    if (bottom) {
+      bottom.style.transform =
+        `translate3d(${x}px, 0, 0)`;
+    }
+  }
+
+  /* =========================================
+     PARTICLE DOM
+     
+     不再每一帧 setParticles。
+     直接操作 particle container。
+  ========================================= */
+
+  function updateParticles() {
+
+    const container =
+      particleContainerRef.current;
+
+    if (!container) return;
+
+    particlesRef.current =
+      particlesRef.current
+        .map(particle => ({
+          ...particle,
+
+          x:
+            particle.x +
+            particle.dx,
+
+          y:
+            particle.y +
+            particle.dy,
+
+          life:
+            particle.life - 0.045,
+        }))
+        .filter(
+          particle =>
+            particle.life > 0
+        )
+        .slice(-35);
+
+    /*
+      使用 DocumentFragment，
+      一次性更新 DOM，
+      比 React 每帧 diff 80 个节点轻很多。
+    */
+
+    const fragment =
+      document.createDocumentFragment();
+
+    particlesRef.current.forEach(
+      particle => {
+
+        const span =
+          document.createElement("span");
+
+        span.className =
+          "flight-particle";
+
+        span.style.left =
+          `${particle.x}px`;
+
+        span.style.top =
+          `${particle.y}px`;
+
+        span.style.width =
+          `${particle.size}px`;
+
+        span.style.height =
+          `${particle.size}px`;
+
+        span.style.opacity =
+          `${particle.life}`;
+
+        span.style.transform =
+          `scale(${particle.life})`;
+
+        fragment.appendChild(span);
+      }
+    );
+
+    container.replaceChildren(fragment);
+  }
 
   /* =========================================
      START GAME
@@ -165,17 +294,15 @@ export default function StarWishFlight({ onComplete }) {
 
     particlesRef.current = [];
 
+    particleFrameRef.current = 0;
+
     lastTimeRef.current = 0;
-
-    setBirdY(250);
-
-    setPipeX(GAME_WIDTH);
-
-    setGapY(gapYRef.current);
 
     setScore(0);
 
-    setParticles([]);
+    setGapY(
+      gapYRef.current
+    );
 
     setGameOver(false);
 
@@ -186,8 +313,29 @@ export default function StarWishFlight({ onComplete }) {
     setCountdown(3);
 
     setStarted(true);
-  }
 
+    /*
+      下一帧再设置 DOM，
+      确保 refs 已经挂载。
+    */
+
+    requestAnimationFrame(() => {
+
+      updateStarPosition(250);
+
+      updatePipePosition(
+        GAME_WIDTH
+      );
+
+      if (
+        particleContainerRef.current
+      ) {
+        particleContainerRef.current
+          .replaceChildren();
+      }
+
+    });
+  }
 
   /* =========================================
      RESTART GAME
@@ -215,21 +363,19 @@ export default function StarWishFlight({ onComplete }) {
 
     particlesRef.current = [];
 
+    particleFrameRef.current = 0;
+
     completed.current = false;
 
     scored.current = false;
 
     lastTimeRef.current = 0;
 
-    setBirdY(250);
-
-    setPipeX(GAME_WIDTH);
-
-    setGapY(gapYRef.current);
-
-    setParticles([]);
-
     setScore(0);
+
+    setGapY(
+      gapYRef.current
+    );
 
     setCountdown(3);
 
@@ -240,8 +386,24 @@ export default function StarWishFlight({ onComplete }) {
     setRewardPhase("appear");
 
     setStarted(true);
-  }
 
+    requestAnimationFrame(() => {
+
+      updateStarPosition(250);
+
+      updatePipePosition(
+        GAME_WIDTH
+      );
+
+      if (
+        particleContainerRef.current
+      ) {
+        particleContainerRef.current
+          .replaceChildren();
+      }
+
+    });
+  }
 
   /* =========================================
      JUMP
@@ -263,7 +425,6 @@ export default function StarWishFlight({ onComplete }) {
       JUMP_FORCE;
   }
 
-
   /* =========================================
      GAME OVER
   ========================================= */
@@ -281,80 +442,145 @@ export default function StarWishFlight({ onComplete }) {
     );
   }
 
-
   /* =========================================
      KEYBOARD / MOUSE
   ========================================= */
 
-  useEffect(() => {
+ useEffect(() => {
 
-    function mouseJump() {
-      jump();
+  /* =========================================
+     MOBILE / MOUSE INPUT
+     
+     Pointer Events 比 mousedown 更适合游戏。
+     手机 touch 会直接触发 pointerdown，
+     不需要等待浏览器转换成 mouse event。
+  ========================================= */
+
+  function handlePointerDown(e) {
+
+    /*
+      只处理主要指针。
+      防止多指同时点击造成重复跳跃。
+    */
+
+    if (
+      e.pointerType === "touch" &&
+      e.isPrimary === false
+    ) {
+      return;
     }
 
+    /*
+      防止手机浏览器把这个动作
+      当成滚动 / 缩放 / 其他手势。
+    */
 
-    function keyJump(e) {
-
-      if (e.code !== "Space") return;
-
+    if (e.cancelable) {
       e.preventDefault();
-
-
-      if (completed.current) {
-        return;
-      }
-
-
-      if (showReward) {
-        return;
-      }
-
-
-      if (gameOverRef.current) {
-
-        restartGame();
-
-        return;
-      }
-
-
-      jump();
     }
 
+    /*
+      游戏结束：
+      点击直接重新开始
+    */
 
-    window.addEventListener(
-      "mousedown",
-      mouseJump
+    if (gameOverRef.current) {
+
+      restartGame();
+
+      return;
+    }
+
+    /*
+      已经完成 / 正在奖励动画
+    */
+
+    if (completed.current) {
+      return;
+    }
+
+    if (showReward) {
+      return;
+    }
+
+    /*
+      正常跳跃
+    */
+
+    jump();
+  }
+
+
+  /* =========================================
+     KEYBOARD
+  ========================================= */
+
+  function handleKeyDown(e) {
+
+    if (e.code !== "Space") {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (completed.current) {
+      return;
+    }
+
+    if (showReward) {
+      return;
+    }
+
+    if (gameOverRef.current) {
+
+      restartGame();
+
+      return;
+    }
+
+    jump();
+  }
+
+
+  /*
+    pointerdown：
+    手机触摸 / 鼠标点击都会立即进入这里
+  */
+
+  window.addEventListener(
+    "pointerdown",
+    handlePointerDown,
+    {
+      passive: false,
+    }
+  );
+
+
+  window.addEventListener(
+    "keydown",
+    handleKeyDown
+  );
+
+
+  return () => {
+
+    window.removeEventListener(
+      "pointerdown",
+      handlePointerDown
     );
 
-    window.addEventListener(
+    window.removeEventListener(
       "keydown",
-      keyJump
+      handleKeyDown
     );
 
+  };
 
-    return () => {
-
-      window.removeEventListener(
-        "mousedown",
-        mouseJump
-      );
-
-      window.removeEventListener(
-        "keydown",
-        keyJump
-      );
-
-    };
-
-  }, [
-    started,
-    countdown,
-    gameOver,
-    showReward
-  ]);
-
-
+}, [
+  started,
+  countdown,
+  showReward
+]);
   /* =========================================
      COUNTDOWN
   ========================================= */
@@ -369,20 +595,17 @@ export default function StarWishFlight({ onComplete }) {
 
     if (countdown <= 0) return;
 
+    const timer =
+      setTimeout(() => {
 
-    const timer = setTimeout(() => {
+        setCountdown(
+          prev => prev - 1
+        );
 
-      setCountdown(
-        prev => prev - 1
-      );
-
-    }, 1000);
-
+      }, 1000);
 
     return () => {
-
       clearTimeout(timer);
-
     };
 
   }, [
@@ -392,9 +615,11 @@ export default function StarWishFlight({ onComplete }) {
     showReward
   ]);
 
-
   /* =========================================
      GAME LOOP
+     
+     IMPORTANT:
+     这里完全不再 setBirdY / setPipeX。
   ========================================= */
 
   useEffect(() => {
@@ -407,10 +632,8 @@ export default function StarWishFlight({ onComplete }) {
 
     if (showReward) return;
 
-
     lastTimeRef.current =
       performance.now();
-
 
     function gameLoop(timestamp) {
 
@@ -418,11 +641,9 @@ export default function StarWishFlight({ onComplete }) {
         return;
       }
 
-
       if (completed.current) {
         return;
       }
-
 
       const delta =
         Math.min(
@@ -431,14 +652,11 @@ export default function StarWishFlight({ onComplete }) {
           32
         );
 
-
       lastTimeRef.current =
         timestamp;
 
-
       const timeScale =
         delta / 16.67;
-
 
       /* =================================
          STAR PHYSICS
@@ -448,12 +666,10 @@ export default function StarWishFlight({ onComplete }) {
         GRAVITY *
         timeScale;
 
-
       let nextBirdY =
         birdYRef.current +
         velocity.current *
         timeScale;
-
 
       /* =================================
          BOUNDARY
@@ -466,17 +682,19 @@ export default function StarWishFlight({ onComplete }) {
         birdYRef.current =
           nextBirdY;
 
-        setBirdY(nextBirdY);
+        updateStarPosition(
+          nextBirdY
+        );
 
         triggerGameOver();
 
         return;
       }
 
-
       if (
         nextBirdY >
-        GAME_HEIGHT - STAR_SIZE
+        GAME_HEIGHT -
+        STAR_SIZE
       ) {
 
         nextBirdY =
@@ -486,19 +704,27 @@ export default function StarWishFlight({ onComplete }) {
         birdYRef.current =
           nextBirdY;
 
-        setBirdY(nextBirdY);
+        updateStarPosition(
+          nextBirdY
+        );
 
         triggerGameOver();
 
         return;
       }
 
-
       birdYRef.current =
         nextBirdY;
 
-      setBirdY(nextBirdY);
+      /* =================================
+         DIRECT DOM UPDATE
+         
+         不触发 React render
+      ================================= */
 
+      updateStarPosition(
+        nextBirdY
+      );
 
       /* =================================
          PIPE
@@ -508,7 +734,6 @@ export default function StarWishFlight({ onComplete }) {
         pipeXRef.current -
         PIPE_SPEED *
         timeScale;
-
 
       if (
         nextPipeX <
@@ -529,28 +754,96 @@ export default function StarWishFlight({ onComplete }) {
           false;
       }
 
-
       pipeXRef.current =
         nextPipeX;
 
-      setPipeX(nextPipeX);
+      updatePipePosition(
+        nextPipeX
+      );
 
+      /* =================================
+         PARTICLES
+         
+         每 2 帧更新一次，
+         手机负担明显降低。
+      ================================= */
+
+      particleFrameRef.current++;
+
+      if (
+        particleFrameRef.current >= 2
+      ) {
+
+        particleFrameRef.current = 0;
+
+        particlesRef.current.push(
+          createParticle(
+            STAR_X + 6,
+            nextBirdY +
+              STAR_SIZE / 2
+          )
+        );
+
+        updateParticles();
+      }
+
+      /* =================================
+         COLLISION
+         
+         直接使用 refs，
+         不依赖 React state。
+      ================================= */
+
+      const birdLeft =
+        STAR_X + 4;
+
+      const birdRight =
+        birdLeft +
+        STAR_HITBOX;
+
+      const birdTop =
+        nextBirdY + 6;
+
+      const birdBottom =
+        birdTop +
+        STAR_HITBOX;
+
+      const pipeLeft =
+        nextPipeX + 12;
+
+      const pipeRight =
+        pipeLeft +
+        PIPE_HITBOX;
+
+      const hitPipe =
+        birdRight >
+          pipeLeft &&
+        birdLeft <
+          pipeRight;
+
+      if (hitPipe) {
+
+        if (
+          birdTop <
+            gapYRef.current ||
+          birdBottom >
+            gapYRef.current +
+              PIPE_GAP
+        ) {
+
+          triggerGameOver();
+
+          return;
+        }
+      }
 
       /* =================================
          SCORE
-
-         计分只在 GAME LOOP 内执行一次。
-         这样一根柱子只会产生一次 +1，
-         不会因为 React 的 pipeX/birdY 更新
-         在同一根柱子通过时重复计分。
       ================================= */
-
-      const scorePipeRight =
-        nextPipeX + 12 + PIPE_HITBOX;
 
       if (
         !scored.current &&
-        scorePipeRight < STAR_X
+        pipeRight < STAR_X
       ) {
 
         scored.current = true;
@@ -561,57 +854,10 @@ export default function StarWishFlight({ onComplete }) {
         scoreRef.current =
           nextScore;
 
-        setScore(nextScore);
-      }
-
-
-      /* =================================
-         PARTICLES
-      ================================= */
-
-      const newParticle =
-        createParticle(
-          STAR_X + 6,
-          nextBirdY +
-            STAR_SIZE / 2
+        setScore(
+          nextScore
         );
-
-
-      particlesRef.current = [
-        ...particlesRef.current,
-        newParticle,
-      ]
-        .map(particle => ({
-
-          ...particle,
-
-          x:
-            particle.x +
-            particle.dx *
-            timeScale,
-
-          y:
-            particle.y +
-            particle.dy *
-            timeScale,
-
-          life:
-            particle.life -
-            0.03 *
-            timeScale,
-
-        }))
-        .filter(
-          particle =>
-            particle.life > 0
-        )
-        .slice(-80);
-
-
-      setParticles(
-        particlesRef.current
-      );
-
+      }
 
       animationFrame.current =
         requestAnimationFrame(
@@ -619,12 +865,10 @@ export default function StarWishFlight({ onComplete }) {
         );
     }
 
-
     animationFrame.current =
       requestAnimationFrame(
         gameLoop
       );
-
 
     return () => {
 
@@ -641,79 +885,6 @@ export default function StarWishFlight({ onComplete }) {
     showReward
   ]);
 
-
-  /* =========================================
-     COLLISION
-  ========================================= */
-
-  useEffect(() => {
-
-    if (!started) return;
-
-    if (gameOver) return;
-
-    if (countdown > 0) return;
-
-    if (showReward) return;
-
-
-    const birdLeft =
-      STAR_X + 4;
-
-    const birdRight =
-      birdLeft +
-      STAR_HITBOX;
-
-    const birdTop =
-      birdY + 6;
-
-    const birdBottom =
-      birdTop +
-      STAR_HITBOX;
-
-
-    const pipeLeft =
-      pipeX + 12;
-
-    const pipeRight =
-      pipeLeft +
-      PIPE_HITBOX;
-
-
-    const hitPipe =
-      birdRight >
-        pipeLeft &&
-      birdLeft <
-        pipeRight;
-
-
-    if (hitPipe) {
-
-      if (
-        birdTop < gapY ||
-        birdBottom >
-          gapY +
-          PIPE_GAP
-      ) {
-
-        triggerGameOver();
-
-        return;
-      }
-    }
-
-
-  }, [
-    birdY,
-    pipeX,
-    gapY,
-    started,
-    countdown,
-    gameOver,
-    showReward
-  ]);
-
-
   /* =========================================
      VICTORY
   ========================================= */
@@ -727,77 +898,106 @@ export default function StarWishFlight({ onComplete }) {
       return;
     }
 
-
     if (
       completed.current
     ) {
       return;
     }
 
-
     completed.current =
       true;
-
 
     cancelAnimationFrame(
       animationFrame.current
     );
 
+  }, [score]);
 
-    /* =====================================
-       通关后先停在提示板
-       玩家点击按钮后才开始红星动画
-    ===================================== */
-
-  }, [score, onComplete]);
-
+  /* =========================================
+     REWARD
+  ========================================= */
 
   function startReward() {
 
     if (showReward) return;
 
+    /*
+      清理旧 timer
+    */
+
+    rewardTimersRef.current.forEach(
+      timer =>
+        clearTimeout(timer)
+    );
+
+    rewardTimersRef.current = [];
+
     setShowReward(true);
+
     setRewardPhase("appear");
 
     const glowTimer =
       setTimeout(() => {
-        setRewardPhase("glow");
+
+        setRewardPhase(
+          "glow"
+        );
+
       }, 700);
 
     const burstTimer =
       setTimeout(() => {
-        setRewardPhase("burst");
+
+        setRewardPhase(
+          "burst"
+        );
+
       }, 1700);
 
-    setTimeout(() => {
-      if (onComplete) {
-        onComplete();
-      }
-    }, REWARD_DURATION);
+    const completeTimer =
+      setTimeout(() => {
 
-    void glowTimer;
-    void burstTimer;
+        if (onComplete) {
+          onComplete();
+        }
+
+      }, REWARD_DURATION);
+
+    rewardTimersRef.current = [
+      glowTimer,
+      burstTimer,
+      completeTimer,
+    ];
   }
 
-
   /* =========================================
-     STAR ROTATION
+     CLEANUP
   ========================================= */
 
-  const starRotation =
-    Math.max(
-      -30,
-      Math.min(
-        velocity.current * 5,
-        60
-      )
-    );
+  useEffect(() => {
 
+    return () => {
+
+      cancelAnimationFrame(
+        animationFrame.current
+      );
+
+      rewardTimersRef.current.forEach(
+        timer =>
+          clearTimeout(timer)
+      );
+
+    };
+
+  }, []);
+
+  /* =========================================
+     PROGRESS
+  ========================================= */
 
   const progress =
     (score / WIN_SCORE) *
     100;
-
 
   /* =========================================
      RENDER
@@ -809,7 +1009,6 @@ export default function StarWishFlight({ onComplete }) {
 
       <StarBackground />
 
-
       <div
         className="flight-game"
         style={{
@@ -818,45 +1017,17 @@ export default function StarWishFlight({ onComplete }) {
         }}
       >
 
-
         {/* =================================
            PARTICLES
+           
+           空 container。
+           粒子由 DOM 直接控制。
         ================================= */}
 
-        <div className="flight-stars">
-
-          {particles.map(
-            particle => (
-
-              <span
-                key={particle.id}
-                className="flight-particle"
-
-                style={{
-                  left:
-                    particle.x,
-
-                  top:
-                    particle.y,
-
-                  width:
-                    particle.size,
-
-                  height:
-                    particle.size,
-
-                  opacity:
-                    particle.life,
-
-                  transform:
-                    `scale(${particle.life})`,
-                }}
-              />
-
-            )
-          )}
-
-        </div>
+        <div
+          className="flight-stars"
+          ref={particleContainerRef}
+        />
 
 
         {/* =================================
@@ -922,16 +1093,13 @@ export default function StarWishFlight({ onComplete }) {
                 ✦
               </div>
 
-
               <h2>
                 星愿启航
               </h2>
 
-
               <p>
                 带着星星飞向属于我们的未来
               </p>
-
 
               <p className="flight-hint">
 
@@ -940,7 +1108,6 @@ export default function StarWishFlight({ onComplete }) {
                 让星星飞起来
 
               </p>
-
 
               <button
                 className="flight-button"
@@ -982,7 +1149,6 @@ export default function StarWishFlight({ onComplete }) {
 
               </div>
 
-
               <div
                 className="
                   countdown-text
@@ -1000,21 +1166,25 @@ export default function StarWishFlight({ onComplete }) {
 
         {/* =================================
            STAR
+           
+           初始位置由 CSS / DOM 控制。
         ================================= */}
 
         <div
+          ref={starElementRef}
           className="wish-star"
-
           style={{
             left: STAR_X,
-            top: birdY,
+            top: 0,
             width: STAR_SIZE,
             height: STAR_SIZE,
-
-            transform:
-              `rotate(${starRotation}deg)`,
           }}
         >
+
+          <div className="wish-star-trail trail-1" />
+          <div className="wish-star-trail trail-2" />
+          <div className="wish-star-trail trail-3" />
+          <div className="wish-star-trail trail-4" />
 
           <div className="wish-star-glow" />
 
@@ -1034,13 +1204,13 @@ export default function StarWishFlight({ onComplete }) {
         ================================= */}
 
         <div
+          ref={pipeTopElementRef}
           className="
             gift-pipe
             gift-pipe-top
           "
-
           style={{
-            left: pipeX,
+            left: 0,
             height: gapY,
           }}
         >
@@ -1077,18 +1247,16 @@ export default function StarWishFlight({ onComplete }) {
         ================================= */}
 
         <div
+          ref={pipeBottomElementRef}
           className="
             gift-pipe
             gift-pipe-bottom
           "
-
           style={{
-            left: pipeX,
-
+            left: 0,
             top:
               gapY +
               PIPE_GAP,
-
             height:
               GAME_HEIGHT -
               gapY -
@@ -1156,16 +1324,13 @@ export default function StarWishFlight({ onComplete }) {
                   ✦
                 </div>
 
-
                 <h2>
                   再试一次
                 </h2>
 
-
                 <p>
                   星星还没有抵达终点
                 </p>
-
 
                 <div
                   className="final-score"
@@ -1174,7 +1339,6 @@ export default function StarWishFlight({ onComplete }) {
                   <span>
                     已收集星愿
                   </span>
-
 
                   <strong>
 
@@ -1188,14 +1352,12 @@ export default function StarWishFlight({ onComplete }) {
 
                 </div>
 
-
                 <button
                   className="flight-button"
                   onClick={restartGame}
                 >
                   重新飞行
                 </button>
-
 
                 <div
                   className="restart-hint"
@@ -1212,11 +1374,6 @@ export default function StarWishFlight({ onComplete }) {
 
         {/* =================================
            NORMAL VICTORY
-           
-           这里不再直接显示旧的
-           「进入第二章」按钮
-           
-           改成红星奖励动画
         ================================= */}
 
         {score >= WIN_SCORE &&
@@ -1241,7 +1398,6 @@ export default function StarWishFlight({ onComplete }) {
 
             </div>
 
-
             <div
               className="
                 flight-card
@@ -1255,7 +1411,6 @@ export default function StarWishFlight({ onComplete }) {
                 ★
               </div>
 
-
               <div
                 className="
                   victory-small-title
@@ -1264,18 +1419,15 @@ export default function StarWishFlight({ onComplete }) {
                 星愿完成
               </div>
 
-
               <h2>
                 星愿已收集
               </h2>
-
 
               <p>
                 你成功带着星星
                 <br />
                 飞到了我们的下一段旅程
               </p>
-
 
               <div
                 className="victory-score"
@@ -1293,7 +1445,6 @@ export default function StarWishFlight({ onComplete }) {
 
               </div>
 
-
               <div
                 className="
                   victory-message
@@ -1306,9 +1457,11 @@ export default function StarWishFlight({ onComplete }) {
 
               </div>
 
-
               <button
-                className="flight-button victory-button"
+                className="
+                  flight-button
+                  victory-button
+                "
                 onClick={startReward}
               >
                 获得第一颗星星
@@ -1323,10 +1476,6 @@ export default function StarWishFlight({ onComplete }) {
 
         {/* =========================================
            RED STAR REWARD
-           
-           第一关专属
-           
-           获得红色星星
         ========================================= */}
 
         {showReward && (
@@ -1349,7 +1498,6 @@ export default function StarWishFlight({ onComplete }) {
                 <span
                   key={index}
                   className="reward-particle"
-
                   style={{
                     "--i": index,
                   }}
@@ -1402,11 +1550,9 @@ export default function StarWishFlight({ onComplete }) {
                 第一颗星愿
               </div>
 
-
               <h2>
                 红色星星已获得
               </h2>
-
 
               <p>
                 一份生日星光，

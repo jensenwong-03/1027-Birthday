@@ -9,6 +9,11 @@
   overflow: hidden;
   background: #06182c;
   color: white;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   font-family:
     "Noto Sans SC",
     "Microsoft YaHei",
@@ -414,8 +419,7 @@
   padding: 10px 22px;
   border: 1px solid rgba(160, 224, 255, 0.16);
   border-radius: 999px;
-  background: rgba(3, 15, 29, 0.56);
-  backdrop-filter: blur(10px);
+  background: rgba(3, 15, 29, 0.78);
   color: rgba(220, 243, 255, 0.86);
   font-size: 13px;
   letter-spacing: 1.2px;
@@ -438,8 +442,9 @@
   padding: 10px;
   border: 1px solid rgba(145, 220, 255, 0.22);
   border-radius: 13px;
-  background: rgba(3, 17, 31, 0.62);
-  backdrop-filter: blur(12px);
+  background: rgba(3, 17, 31, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-shadow:
     0 0 25px rgba(50, 169, 255, 0.06);
   pointer-events: none;
@@ -527,6 +532,7 @@
   box-shadow:
     0 0 8px rgba(255, 255, 255, 0.9),
     0 0 15px rgba(112, 220, 255, 0.8);
+  will-change: left, top;
 }
 
 
@@ -565,8 +571,9 @@
   padding: 11px 13px;
   border: 1px solid rgba(148, 217, 243, 0.16);
   border-radius: 13px;
-  background: rgba(3, 16, 30, 0.58);
-  backdrop-filter: blur(11px);
+  background: rgba(3, 16, 30, 0.76);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow:
     0 0 25px rgba(53, 172, 225, 0.05);
   pointer-events: none;
@@ -670,7 +677,8 @@
       rgba(7, 27, 48, 0.72),
       rgba(4, 15, 31, 0.6)
     );
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   box-shadow:
     0 0 35px rgba(71, 189, 255, 0.08),
     inset 0 0 25px rgba(141, 223, 255, 0.025);
@@ -763,7 +771,8 @@
   border: 1px solid rgba(185, 155, 255, 0.3);
   border-radius: 16px;
   background: rgba(11, 12, 35, 0.62);
-  backdrop-filter: blur(13px);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   box-shadow:
     0 0 35px rgba(178, 137, 255, 0.1);
   text-align: center;
@@ -832,7 +841,8 @@
       rgba(115, 193, 255, 0.15),
       rgba(3, 10, 23, 0.78)
     );
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   pointer-events: none;
 }
 
@@ -951,11 +961,1119 @@
 
 }
 
+/* =========================================================
+   红色星星奖励动画
+========================================================= */
+
+.star-reward-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(120, 10, 30, 0.30),
+            rgba(5, 3, 15, 0.96) 70%
+        );
+
+    animation:
+        rewardBackgroundIn
+        .7s ease both;
+
+}
+
 
 /* =========================================================
-   第三颗星愿：蓝色星星奖励动画
-   与第一关红色星星完全相同的动画节奏
+   星尘
 ========================================================= */
+
+.reward-particle-field {
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+}
+
+
+.reward-particle {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    font-size:
+        calc(
+            8px +
+            var(--i) * .45px
+        );
+
+    color: rgba(255,255,255,.9);
+
+    text-shadow:
+        0 0 8px white,
+        0 0 18px rgba(255,80,100,.9);
+
+    opacity: 0;
+
+    animation:
+        rewardParticle
+        2.8s
+        ease-out
+        infinite;
+
+    animation-delay:
+        calc(
+            var(--i) * -0.09s
+        );
+
+}
+
+
+.reward-particle:nth-child(3n) {
+
+    color:
+        rgba(255,80,100,.95);
+
+}
+
+
+.reward-particle:nth-child(3n + 1) {
+
+    color:
+        rgba(255,255,255,.95);
+
+}
+
+
+.reward-particle:nth-child(3n + 2) {
+
+    color:
+        rgba(255,180,190,.95);
+
+}
+
+
+@keyframes rewardParticle {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            translate(-50%, -50%)
+            rotate(0deg)
+            scale(.3);
+
+    }
+
+    20% {
+
+        opacity: 1;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            translate(
+                calc(
+                    -50% +
+                    (var(--i) - 14) * 34px
+                ),
+                calc(
+                    -50% +
+                    (var(--i) - 14) * 24px
+                )
+            )
+            rotate(180deg)
+            scale(1.3);
+
+    }
+
+}
+
+
+/* =========================================================
+   光圈
+========================================================= */
+
+.reward-rings {
+
+    position: absolute;
+
+    width: 430px;
+
+    height: 430px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.reward-ring {
+
+    position: absolute;
+
+    width: 100%;
+
+    height: 100%;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(255,90,110,.18);
+
+    box-shadow:
+        0 0 25px
+        rgba(255,50,80,.12),
+
+        inset 0 0 25px
+        rgba(255,50,80,.08);
+
+    transform: scale(.2);
+
+    opacity: 0;
+
+}
+
+
+.ring-one {
+
+    animation:
+        rewardRingOne
+        2.8s
+        ease-out
+        both;
+
+}
+
+
+.ring-two {
+
+    animation:
+        rewardRingTwo
+        2.8s
+        ease-out
+        both;
+
+}
+
+
+.ring-three {
+
+    animation:
+        rewardRingThree
+        2.8s
+        ease-out
+        both;
+
+}
+
+
+@keyframes rewardRingOne {
+
+    0% {
+
+        opacity: 0;
+
+        transform: scale(.2);
+
+    }
+
+    35% {
+
+        opacity: .8;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform: scale(1.25);
+
+    }
+
+}
+
+
+@keyframes rewardRingTwo {
+
+    0% {
+
+        opacity: 0;
+
+        transform: scale(.1);
+
+    }
+
+    45% {
+
+        opacity: .6;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform: scale(1.55);
+
+    }
+
+}
+
+
+@keyframes rewardRingThree {
+
+    0% {
+
+        opacity: 0;
+
+        transform: scale(.05);
+
+    }
+
+    55% {
+
+        opacity: .45;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform: scale(1.9);
+
+    }
+
+}
+
+
+/* =========================================================
+   红色星星
+========================================================= */
+
+.reward-red-star {
+
+    position: relative;
+
+    z-index: 10;
+
+    width: 170px;
+
+    height: 170px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transform: scale(.1);
+
+    opacity: 0;
+
+}
+
+
+.star-reward-appear
+.reward-red-star {
+
+    animation:
+        redStarAppear
+        1s
+        cubic-bezier(.16,1,.3,1)
+        both;
+
+}
+
+
+.star-reward-glow
+.reward-red-star {
+
+    animation:
+        redStarGlow
+        1.8s
+        ease-in-out
+        both;
+
+}
+
+
+.star-reward-burst
+.reward-red-star {
+
+    animation:
+        redStarBurst
+        1.2s
+        cubic-bezier(.16,1,.3,1)
+        both;
+
+}
+
+
+.reward-star-halo {
+
+    position: absolute;
+
+    width: 180px;
+
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,50,70,.55),
+            rgba(255,30,60,.22) 35%,
+            transparent 72%
+        );
+
+    filter: blur(10px);
+
+}
+
+
+.reward-star-core {
+
+    position: relative;
+
+    z-index: 3;
+
+    font-size: 145px;
+
+    line-height: 1;
+
+    color: #ff5068;
+
+    text-shadow:
+
+        0 0 8px #fff,
+
+        0 0 18px #ffb0b9,
+
+        0 0 35px #ff405c,
+
+        0 0 65px #ff304d,
+
+        0 0 100px rgba(255,30,60,.9),
+
+        0 0 150px rgba(255,20,50,.65);
+
+}
+
+
+.reward-star-shine {
+
+    position: absolute;
+
+    z-index: 5;
+
+    top: 6px;
+
+    right: 10px;
+
+    font-size: 34px;
+
+    color: white;
+
+    text-shadow:
+
+        0 0 10px white,
+
+        0 0 25px #ffb5c0;
+
+    animation:
+        rewardShine
+        1.4s
+        ease-in-out
+        infinite;
+
+}
+
+
+.reward-star-rays {
+
+    position: absolute;
+
+    width: 260px;
+
+    height: 260px;
+
+    border-radius: 50%;
+
+    background:
+
+        conic-gradient(
+            from 0deg,
+            transparent,
+            rgba(255,70,90,.25),
+            transparent 10%,
+            transparent 20%,
+            rgba(255,90,110,.18),
+            transparent 30%,
+            transparent 45%,
+            rgba(255,70,90,.22),
+            transparent 55%,
+            transparent 70%,
+            rgba(255,100,120,.2),
+            transparent 80%,
+            transparent
+        );
+
+    filter: blur(4px);
+
+    animation:
+        rayRotate
+        5s
+        linear
+        infinite;
+
+}
+
+
+/* =========================================================
+   奖励文字
+========================================================= */
+
+.reward-text {
+
+    position: absolute;
+
+    z-index: 20;
+
+    top: calc(50% + 125px);
+
+    width: 100%;
+
+    text-align: center;
+
+    opacity: 0;
+
+    transform:
+        translateY(20px);
+
+}
+
+
+.star-reward-glow
+.reward-text {
+
+    animation:
+        rewardTextIn
+        .8s
+        .25s
+        ease-out
+        both;
+
+}
+
+
+.star-reward-burst
+.reward-text {
+
+    animation:
+        rewardTextFinal
+        .8s
+        ease-out
+        both;
+
+}
+
+
+.reward-small-text {
+
+    font-size: 11px;
+
+    letter-spacing: 5px;
+
+    color:
+        rgba(255,180,190,.7);
+
+    margin-bottom: 10px;
+
+}
+
+
+.reward-text h2 {
+
+    margin: 0;
+
+    font-size: 30px;
+
+    font-weight: 600;
+
+    letter-spacing: 5px;
+
+    color: white;
+
+    text-shadow:
+
+        0 0 10px white,
+
+        0 0 25px #ff5068,
+
+        0 0 45px rgba(255,50,80,.8);
+
+}
+
+
+.reward-text p {
+
+    margin-top: 12px;
+
+    font-size: 14px;
+
+    line-height: 1.9;
+
+    color:
+        rgba(255,255,255,.62);
+
+}
+
+
+/* =========================================================
+   最后爆发白光
+========================================================= */
+
+.reward-flash {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 40;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(255,255,255,1),
+            rgba(255,130,150,.85) 18%,
+            rgba(255,50,80,.25) 40%,
+            transparent 70%
+        );
+
+    opacity: 0;
+
+}
+
+
+.star-reward-burst
+.reward-flash {
+
+    animation:
+        rewardFlash
+        1.2s
+        2s
+        ease-out
+        both;
+
+}
+
+
+/* =========================================================
+   动画
+========================================================= */
+
+@keyframes rewardBackgroundIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            scale(1.08);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes redStarAppear {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.05)
+            rotate(-25deg);
+
+    }
+
+    45% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.18)
+            rotate(8deg);
+
+    }
+
+    70% {
+
+        transform:
+            scale(.94)
+            rotate(-3deg);
+
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            rotate(0deg);
+
+    }
+
+}
+
+
+@keyframes redStarGlow {
+
+    0% {
+
+        opacity: 1;
+
+        transform:
+            scale(1);
+
+    }
+
+    50% {
+
+        transform:
+            scale(1.13);
+
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.06);
+
+    }
+
+}
+
+
+@keyframes redStarBurst {
+
+    0% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.06);
+
+    }
+
+    45% {
+
+        transform:
+            scale(1.28);
+
+    }
+
+    100% {
+
+        opacity: .92;
+
+        transform:
+            scale(1.12);
+
+    }
+
+}
+
+
+@keyframes rewardShine {
+
+    0%,
+    100% {
+
+        transform:
+            scale(.8)
+            rotate(0deg);
+
+        opacity: .65;
+
+    }
+
+    50% {
+
+        transform:
+            scale(1.35)
+            rotate(20deg);
+
+        opacity: 1;
+
+    }
+
+}
+
+
+@keyframes rayRotate {
+
+    from {
+
+        transform:
+            rotate(0deg);
+
+    }
+
+    to {
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+@keyframes rewardTextIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(25px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+@keyframes rewardTextFinal {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(15px)
+            scale(.96);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes rewardFlash {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.5);
+
+    }
+
+    35% {
+
+        opacity: .9;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            scale(1.8);
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE GAME CONTROLS
+   ========================================================= */
+
+.chapter3-mobile-look-zone {
+  position: fixed;
+  left: 42%;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 21;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/*
+ * FREE / FLOATING JOYSTICK
+ * 整个左侧都是移动触摸区，摇杆视觉中心会出现在手指按下的位置。
+ */
+.chapter3-mobile-joystick {
+  position: fixed;
+  left: 0;
+  right: 58%;
+  top: 0;
+  bottom: 0;
+  z-index: 34;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-joystick-visual {
+  position: absolute;
+  width: 132px;
+  height: 132px;
+  margin-left: -66px;
+  margin-top: -66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease;
+  will-change: left, top, opacity;
+}
+
+.mobile-joystick-ring {
+  position: relative;
+  width: 116px;
+  height: 116px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(167, 230, 255, 0.25);
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(108, 206, 255, 0.13),
+      rgba(5, 24, 43, 0.38) 68%,
+      rgba(4, 17, 31, 0.18)
+    );
+  box-shadow:
+    0 0 24px rgba(65, 190, 255, 0.08),
+    inset 0 0 25px rgba(120, 218, 255, 0.06);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.mobile-joystick-ring::before,
+.mobile-joystick-ring::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mobile-joystick-ring::before {
+  inset: 15px;
+  border: 1px solid rgba(175, 229, 255, 0.11);
+}
+
+.mobile-joystick-ring::after {
+  width: 3px;
+  height: 3px;
+  background: rgba(220, 249, 255, 0.55);
+  box-shadow: 0 0 8px rgba(120, 224, 255, 0.75);
+}
+
+.mobile-joystick-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
+  border: 1px solid rgba(210, 247, 255, 0.45);
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(224, 252, 255, 0.42),
+      rgba(76, 182, 235, 0.22) 42%,
+      rgba(11, 46, 72, 0.65)
+    );
+  box-shadow:
+    0 0 18px rgba(92, 207, 255, 0.24),
+    inset 0 0 14px rgba(185, 239, 255, 0.12);
+  will-change: transform;
+  pointer-events: none;
+  transform: translate(0, 0);
+}
+
+.chapter3-mobile-actions {
+  position: fixed;
+  right: 22px;
+  bottom: 28px;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  touch-action: none;
+}
+
+.mobile-action {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  border: 1px solid rgba(167, 228, 255, 0.27);
+  border-radius: 50%;
+  color: rgba(230, 249, 255, 0.92);
+  background: rgba(4, 20, 37, 0.55);
+  box-shadow:
+    0 0 22px rgba(65, 187, 255, 0.08),
+    inset 0 0 18px rgba(121, 220, 255, 0.05);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  font-family: inherit;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-action:active,
+.mobile-action.active {
+  transform: scale(0.94);
+  border-color: rgba(165, 235, 255, 0.6);
+  background: rgba(63, 166, 224, 0.24);
+  box-shadow:
+    0 0 28px rgba(83, 202, 255, 0.22),
+    inset 0 0 18px rgba(157, 235, 255, 0.09);
+}
+
+.mobile-action span {
+  font-size: 22px;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(130, 224, 255, 0.6);
+}
+
+.mobile-action small {
+  margin-top: 4px;
+  color: rgba(186, 218, 231, 0.58);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+
+.mobile-jump span {
+  font-size: 25px;
+}
+
+.mobile-run span {
+  font-size: 20px;
+}
+
+.chapter3-mobile-look-hint {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  z-index: 22;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  transform: translateY(-50%);
+  color: rgba(192, 229, 242, 0.25);
+  text-align: right;
+  pointer-events: none;
+  opacity: 0;
+  animation: mobileLookHint 1s ease 1.5s forwards;
+}
+
+.chapter3-mobile-look-hint span {
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+.chapter3-mobile-look-hint small {
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+
+@keyframes mobileLookHint {
+  from { opacity: 0; transform: translateY(-50%) translateX(8px); }
+  to { opacity: 0.72; transform: translateY(-50%) translateX(0); }
+}
+
+
+/* =========================================================
+   THIRD STAR REWARD — BLUE
+   ========================================================= */
 
 .chapter3-reward-overlay {
   position: fixed;
@@ -995,17 +2113,9 @@
   animation-delay: calc(var(--i) * -0.09s);
 }
 
-.chapter3-reward-particle:nth-child(3n) {
-  color: rgba(70,180,255,.95);
-}
-
-.chapter3-reward-particle:nth-child(3n + 1) {
-  color: rgba(255,255,255,.95);
-}
-
-.chapter3-reward-particle:nth-child(3n + 2) {
-  color: rgba(155,220,255,.95);
-}
+.chapter3-reward-particle:nth-child(3n) { color: rgba(70,180,255,.95); }
+.chapter3-reward-particle:nth-child(3n + 1) { color: rgba(255,255,255,.95); }
+.chapter3-reward-particle:nth-child(3n + 2) { color: rgba(155,220,255,.95); }
 
 .chapter3-reward-rings {
   position: absolute;
@@ -1190,12 +2300,106 @@
   animation: rewardFlash 1.2s 2s ease-out both;
 }
 
-/* Fallback copies of the shared first-chapter keyframes.
-   These are intentionally identical to preserve the timing. */
-@keyframes rewardBackgroundIn {
-  from { opacity: 0; transform: scale(1.08); }
-  to { opacity: 1; transform: scale(1); }
+
+/* =========================================================
+   CHAPTER 3 COMPLETE BOARD
+   ========================================================= */
+
+.chapter3-complete-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(22, 55, 105, 0.45),
+      rgba(3, 7, 20, 0.82) 72%
+    );
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
+
+.chapter3-complete-card {
+  width: min(430px, calc(100vw - 40px));
+  padding: 42px 38px 34px;
+  text-align: center;
+  border: 1px solid rgba(120, 205, 255, 0.28);
+  border-radius: 24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(13, 30, 58, 0.96),
+      rgba(5, 12, 29, 0.94)
+    );
+  box-shadow:
+    0 0 55px rgba(54, 164, 255, 0.18),
+    inset 0 0 35px rgba(92, 185, 255, 0.05);
+  animation: chapter3CompleteIn .65s cubic-bezier(.16,1,.3,1) both;
+}
+
+.chapter3-complete-symbol {
+  font-size: 48px;
+  color: #79dfff;
+  text-shadow:
+    0 0 12px white,
+    0 0 35px rgba(55, 190, 255, .8);
+}
+
+.chapter3-complete-tag {
+  margin-top: 12px;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: rgba(145, 215, 255, .68);
+}
+
+.chapter3-complete-card h2 {
+  margin: 14px 0 0;
+  font-size: 29px;
+  letter-spacing: 4px;
+}
+
+.chapter3-complete-card p {
+  margin: 18px 0 0;
+  color: rgba(255,255,255,.64);
+  line-height: 1.9;
+  font-size: 14px;
+}
+
+.chapter3-complete-divider {
+  margin: 22px 0 18px;
+  color: rgba(126, 220, 255, .72);
+}
+
+.chapter3-complete-button {
+  border: 1px solid rgba(122, 220, 255, .5);
+  border-radius: 999px;
+  padding: 12px 28px;
+  color: white;
+  background: rgba(76, 176, 255, .12);
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: .25s ease;
+  font-family: inherit;
+}
+
+.chapter3-complete-button:hover {
+  background: rgba(76, 176, 255, .25);
+  box-shadow: 0 0 28px rgba(76, 176, 255, .25);
+  transform: translateY(-1px);
+}
+
+@keyframes chapter3CompleteIn {
+  from { opacity: 0; transform: translateY(20px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+
+/* =========================================================
+   REWARD KEYFRAMES
+   ========================================================= */
 
 @keyframes rewardParticle {
   0% { opacity: 0; transform: translate(-50%, -50%) rotate(0deg) scale(.3); }
@@ -1275,36 +2479,969 @@
 
 
 /* =========================================================
-   CHAPTER 3 COMPLETE BOARD
+   MOBILE PERFORMANCE / LAYOUT
+   ========================================================= */
+
+.chapter3-page,
+.chapter3-page canvas {
+  touch-action: none;
+}
+
+@media (max-width: 800px), (pointer: coarse) {
+
+  .chapter3-controls,
+  .chapter3-crosshair {
+    display: none;
+  }
+
+  .chapter3-message {
+    bottom: 174px;
+    max-width: 72vw;
+    padding: 8px 14px;
+    font-size: 10px;
+  }
+
+  .chapter3-password {
+    top: 13px;
+    min-width: 198px;
+    padding: 9px 13px 10px;
+  }
+
+  .password-label {
+    margin-bottom: 6px;
+    font-size: 8px;
+    letter-spacing: 3px;
+  }
+
+  .password-digits {
+    gap: 8px;
+  }
+
+  .password-digit {
+    width: 27px;
+    height: 32px;
+    font-size: 17px;
+  }
+
+  .chapter3-minimap {
+    top: 12px;
+    right: 12px;
+    width: 108px;
+    padding: 7px;
+  }
+
+  .minimap-title {
+    margin-bottom: 5px;
+    font-size: 7px;
+    letter-spacing: 2px;
+  }
+
+  .chapter3-explore-hint {
+    min-width: 235px;
+    max-width: 76vw;
+    padding: 16px 18px;
+  }
+
+  .explore-hint-title {
+    font-size: 15px;
+    letter-spacing: 4px;
+  }
+
+  .explore-hint-text {
+    font-size: 10px;
+  }
+
+  .chapter3-gate-ready {
+    bottom: 175px;
+    min-width: 250px;
+    max-width: 78vw;
+    padding: 14px 18px;
+  }
+
+  .chapter3-gate-ready p {
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+
+  .chapter3-gate-ready span {
+    font-size: 9px;
+  }
+
+  .chapter3-entering p {
+    max-width: 82vw;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .chapter3-complete-card {
+    width: min(380px, calc(100vw - 34px));
+    padding: 32px 24px 27px;
+    border-radius: 20px;
+  }
+
+  .chapter3-complete-symbol {
+    font-size: 42px;
+  }
+
+  .chapter3-complete-card h2 {
+    font-size: 23px;
+    letter-spacing: 3px;
+  }
+
+  .chapter3-complete-card p {
+    font-size: 12px;
+  }
+
+  .chapter3-reward-rings {
+    width: min(430px, 105vw);
+    height: min(430px, 105vw);
+  }
+
+  .chapter3-reward-blue-star {
+    width: 140px;
+    height: 140px;
+  }
+
+  .chapter3-reward-star-core {
+    font-size: 120px;
+  }
+
+  .chapter3-reward-star-halo {
+    width: 155px;
+    height: 155px;
+  }
+
+  .chapter3-reward-star-rays {
+    width: 220px;
+    height: 220px;
+  }
+
+  .chapter3-reward-text {
+    top: calc(50% + 105px);
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
+  .chapter3-reward-text h2 {
+    font-size: 23px;
+    letter-spacing: 3px;
+  }
+
+  .chapter3-reward-text p {
+    font-size: 11px;
+  }
+
+}
+
+@media (max-width: 380px) {
+
+  .mobile-joystick-visual {
+    transform: scale(.88);
+    transform-origin: center;
+  }
+
+  .chapter3-mobile-actions {
+    right: 10px;
+    bottom: 20px;
+    transform: scale(.88);
+    transform-origin: bottom right;
+  }
+
+  .chapter3-message {
+    bottom: 145px;
+  }
+
+  .chapter3-minimap {
+    width: 96px;
+  }
+
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+
+  .mobile-joystick-visual {
+    transform: scale(.82);
+    transform-origin: center;
+  }
+
+  .chapter3-mobile-actions {
+    right: 14px;
+    bottom: 16px;
+    transform: scale(.82);
+    transform-origin: bottom right;
+  }
+
+  .chapter3-password {
+    top: 8px;
+  }
+
+  .chapter3-minimap {
+    top: 8px;
+    right: 8px;
+  }
+
+  .chapter3-message {
+    bottom: 92px;
+  }
+
+}
+
+
+/* =========================================================
+   PERFORMANCE SAFETY
+   ========================================================= */
+
+.chapter3-page * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter3-page *,
+  .chapter3-page *::before,
+  .chapter3-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================
+   CHAPTER 3 COMPLETE BOARD — FINAL FIX
+   集齐 4 颗星钥匙后的提示板
+   不遮挡第一人称主要视野
    ========================================================= */
 
 .chapter3-complete-overlay {
   position: fixed;
   inset: 0;
   z-index: 90;
+
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  background: radial-gradient(circle at center, rgba(22, 55, 105, 0.45), rgba(3, 7, 20, 0.82) 72%);
-  backdrop-filter: blur(4px);
+
+  /*
+   * 不再垂直居中
+   * 把提示板放到画面上方区域
+   */
+  padding-top: 16vh;
+
+  box-sizing: border-box;
+
+  /*
+   * 原本太黑会把整个 3D 世界盖掉
+   * 现在只留下非常轻的氛围层
+   */
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(22, 55, 105, 0.20),
+      rgba(3, 7, 20, 0.42) 72%
+    );
+
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+
+  pointer-events: auto;
 }
 
 .chapter3-complete-card {
   width: min(430px, calc(100vw - 40px));
-  padding: 42px 38px 34px;
+
+  padding: 32px 34px 27px;
+
+  box-sizing: border-box;
+
   text-align: center;
+
   border: 1px solid rgba(120, 205, 255, 0.28);
-  border-radius: 24px;
-  background: linear-gradient(145deg, rgba(13, 30, 58, 0.96), rgba(5, 12, 29, 0.94));
-  box-shadow: 0 0 55px rgba(54, 164, 255, 0.18), inset 0 0 35px rgba(92, 185, 255, 0.05);
-  animation: chapter3CompleteIn .65s cubic-bezier(.16,1,.3,1) both;
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(13, 30, 58, 0.90),
+      rgba(5, 12, 29, 0.86)
+    );
+
+  box-shadow:
+    0 0 45px rgba(54, 164, 255, 0.14),
+    inset 0 0 30px rgba(92, 185, 255, 0.04);
+
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+
+  animation:
+    chapter3CompleteIn
+    .65s
+    cubic-bezier(.16, 1, .3, 1)
+    both;
 }
 
-.chapter3-complete-symbol { font-size: 48px; color: #79dfff; text-shadow: 0 0 12px white, 0 0 35px rgba(55, 190, 255, .8); }
-.chapter3-complete-tag { margin-top: 12px; font-size: 10px; letter-spacing: 4px; color: rgba(145, 215, 255, .68); }
-.chapter3-complete-card h2 { margin: 14px 0 0; font-size: 29px; letter-spacing: 4px; }
-.chapter3-complete-card p { margin: 18px 0 0; color: rgba(255,255,255,.64); line-height: 1.9; font-size: 14px; }
-.chapter3-complete-divider { margin: 22px 0 18px; color: rgba(126, 220, 255, .72); }
-.chapter3-complete-button { border: 1px solid rgba(122, 220, 255, .5); border-radius: 999px; padding: 12px 28px; color: white; background: rgba(76, 176, 255, .12); cursor: pointer; letter-spacing: 2px; transition: .25s ease; }
-.chapter3-complete-button:hover { background: rgba(76, 176, 255, .25); box-shadow: 0 0 28px rgba(76, 176, 255, .25); transform: translateY(-1px); }
-@keyframes chapter3CompleteIn { from { opacity: 0; transform: translateY(20px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.chapter3-complete-symbol {
+  font-size: 42px;
+
+  color: #79dfff;
+
+  text-shadow:
+    0 0 12px white,
+    0 0 35px rgba(55, 190, 255, .8);
+}
+
+.chapter3-complete-tag {
+  margin-top: 8px;
+
+  font-size: 9px;
+
+  letter-spacing: 4px;
+
+  color: rgba(145, 215, 255, .68);
+}
+
+.chapter3-complete-card h2 {
+  margin: 11px 0 0;
+
+  font-size: 27px;
+
+  letter-spacing: 4px;
+
+  color: rgba(245, 252, 255, .96);
+}
+
+.chapter3-complete-card p {
+  margin: 14px 0 0;
+
+  color: rgba(255, 255, 255, .62);
+
+  line-height: 1.8;
+
+  font-size: 13px;
+}
+
+.chapter3-complete-divider {
+  margin: 18px 0 15px;
+
+  color: rgba(126, 220, 255, .72);
+}
+
+.chapter3-complete-button {
+  border: 1px solid rgba(122, 220, 255, .5);
+
+  border-radius: 999px;
+
+  padding: 11px 27px;
+
+  color: white;
+
+  background: rgba(76, 176, 255, .12);
+
+  cursor: pointer;
+
+  letter-spacing: 2px;
+
+  transition:
+    background .25s ease,
+    box-shadow .25s ease,
+    transform .25s ease;
+
+  font-family: inherit;
+}
+
+.chapter3-complete-button:hover {
+  background: rgba(76, 176, 255, .25);
+
+  box-shadow:
+    0 0 28px rgba(76, 176, 255, .25);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   COMPLETE BOARD ANIMATION
+   ========================================================= */
+
+@keyframes chapter3CompleteIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-18px)
+      scale(.96);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px), (pointer: coarse) {
+
+  .chapter3-complete-overlay {
+    padding-top: 18vh;
+
+    background:
+      radial-gradient(
+        circle at center,
+        rgba(22, 55, 105, 0.12),
+        rgba(3, 7, 20, 0.32) 72%
+      );
+
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+  }
+
+  .chapter3-complete-card {
+    width: min(
+      350px,
+      calc(100vw - 42px)
+    );
+
+    padding: 25px 21px 22px;
+
+    border-radius: 18px;
+
+    background:
+      linear-gradient(
+        145deg,
+        rgba(13, 30, 58, 0.88),
+        rgba(5, 12, 29, 0.82)
+      );
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    box-shadow:
+      0 0 35px rgba(54, 164, 255, 0.12),
+      inset 0 0 25px rgba(92, 185, 255, 0.035);
+  }
+
+  .chapter3-complete-symbol {
+    font-size: 36px;
+  }
+
+  .chapter3-complete-tag {
+    margin-top: 7px;
+
+    font-size: 8px;
+
+    letter-spacing: 3px;
+  }
+
+  .chapter3-complete-card h2 {
+    margin-top: 9px;
+
+    font-size: 21px;
+
+    letter-spacing: 3px;
+  }
+
+  .chapter3-complete-card p {
+    margin-top: 11px;
+
+    font-size: 11px;
+
+    line-height: 1.75;
+  }
+
+  .chapter3-complete-divider {
+    margin: 15px 0 13px;
+  }
+
+  .chapter3-complete-button {
+    padding: 10px 23px;
+
+    font-size: 11px;
+
+    letter-spacing: 1.5px;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .chapter3-complete-overlay {
+    padding-top: 15vh;
+  }
+
+  .chapter3-complete-card {
+    width: calc(100vw - 32px);
+
+    padding: 22px 18px 20px;
+  }
+
+  .chapter3-complete-symbol {
+    font-size: 32px;
+  }
+
+  .chapter3-complete-card h2 {
+    font-size: 19px;
+  }
+}
+
+
+/* =========================================================
+   LANDSCAPE PHONE
+   ========================================================= */
+
+@media (orientation: landscape) and (max-height: 520px) {
+
+  .chapter3-complete-overlay {
+    padding-top: 8vh;
+  }
+
+  .chapter3-complete-card {
+    width: min(
+      390px,
+      calc(100vw - 32px)
+    );
+
+    padding: 18px 22px 16px;
+  }
+
+  .chapter3-complete-symbol {
+    font-size: 30px;
+  }
+
+  .chapter3-complete-card h2 {
+    margin-top: 6px;
+
+    font-size: 20px;
+  }
+
+  .chapter3-complete-card p {
+    margin-top: 7px;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+  }
+
+  .chapter3-complete-divider {
+    margin: 10px 0;
+  }
+
+  .chapter3-complete-button {
+    padding: 8px 20px;
+
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   MOBILE LANDSCAPE EXPERIENCE HINT
+   进入第三关时提示横屏
+   ========================================================= */
+
+.chapter3-landscape-hint {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+
+  width: min(360px, calc(100vw - 42px));
+
+  transform:
+    translate(-50%, -50%);
+
+  z-index: 120;
+
+  padding: 30px 28px 27px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  border:
+    1px solid
+    rgba(150, 225, 255, 0.32);
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(8, 25, 48, 0.94),
+      rgba(4, 12, 27, 0.92)
+    );
+
+  box-shadow:
+    0 0 45px
+      rgba(65, 190, 255, 0.16),
+
+    inset 0 0 30px
+      rgba(110, 210, 255, 0.035);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  pointer-events: none;
+
+  animation:
+    chapter3LandscapeHintIn
+    .65s
+    cubic-bezier(.16, 1, .3, 1)
+    both;
+
+  font-family:
+    "Noto Sans SC",
+    "Microsoft YaHei",
+    sans-serif;
+}
+
+
+/* 星星图标 */
+
+.chapter3-landscape-icon {
+  font-size: 34px;
+
+  margin-bottom: 13px;
+
+  color: #8eeaff;
+
+  text-shadow:
+    0 0 12px white,
+    0 0 30px
+      rgba(75, 200, 255, .8);
+}
+
+
+/* 小标题 */
+
+.chapter3-landscape-label {
+  font-size: 9px;
+
+  letter-spacing: 4px;
+
+  color:
+    rgba(150, 220, 255, .62);
+
+  margin-bottom: 9px;
+}
+
+
+/* 主标题 */
+
+.chapter3-landscape-hint h2 {
+  margin: 0;
+
+  font-size: 22px;
+
+  letter-spacing: 3px;
+
+  font-weight: 500;
+
+  color:
+    rgba(248, 253, 255, .96);
+}
+
+
+/* 描述 */
+
+.chapter3-landscape-hint p {
+  margin: 12px 0 0;
+
+  font-size: 12px;
+
+  line-height: 1.8;
+
+  color:
+    rgba(255, 255, 255, .62);
+}
+
+
+/* 手机图示 */
+
+.chapter3-landscape-phone {
+  position: relative;
+
+  width: 42px;
+  height: 70px;
+
+  margin:
+    18px auto 13px;
+
+  border:
+    1px solid
+    rgba(155, 225, 255, .58);
+
+  border-radius: 8px;
+
+  transform: rotate(90deg);
+
+  box-shadow:
+    0 0 18px
+      rgba(70, 205, 255, .18);
+}
+
+.chapter3-landscape-phone::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 4px;
+
+  width: 4px;
+  height: 4px;
+
+  transform:
+    translateX(-50%);
+
+  border-radius: 50%;
+
+  background:
+    rgba(180, 235, 255, .65);
+}
+
+
+/* 淡出 */
+
+.chapter3-landscape-hint-fade {
+  animation:
+    chapter3LandscapeHintOut
+    1s
+    ease
+    3.5s
+    forwards;
+}
+
+
+@keyframes chapter3LandscapeHintIn {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -46%)
+      scale(.94);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+
+}
+
+
+@keyframes chapter3LandscapeHintOut {
+
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+
+}
+
+
+/* =========================================================
+   STAR GATE READY
+   集齐四颗钥匙后的提示
+   ========================================================= */
+
+.chapter3-gate-ready {
+  pointer-events: none;
+}
+
+
+/*
+ * 让提示本身从出现到消失更自然
+ */
+.chapter3-gate-ready-fade {
+  animation:
+    chapter3GateReadyIn
+    .7s
+    cubic-bezier(.16, 1, .3, 1)
+    both;
+}
+
+
+.chapter3-gate-ready-fade::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -18px;
+
+  border-radius: inherit;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(100, 220, 255, .12),
+      transparent 68%
+    );
+
+  opacity: 0;
+
+  animation:
+    chapter3GateReadyGlow
+    2.8s
+    ease
+    .2s
+    both;
+}
+
+
+@keyframes chapter3GateReadyIn {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, 12px)
+      scale(.96);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, 0)
+      scale(1);
+  }
+
+}
+
+
+@keyframes chapter3GateReadyGlow {
+
+  0% {
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+
+}
+
+
+/* 新增的第二行 */
+
+.chapter3-gate-ready strong {
+  display: block;
+
+  margin-top: 8px;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  letter-spacing: 2px;
+
+  color:
+    rgba(150, 230, 255, .92);
+
+  text-shadow:
+    0 0 14px
+    rgba(80, 210, 255, .42);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px), (pointer: coarse) {
+
+  .chapter3-landscape-hint {
+    width: min(
+      330px,
+      calc(100vw - 38px)
+    );
+
+    padding:
+      26px
+      22px
+      24px;
+
+    border-radius: 19px;
+  }
+
+  .chapter3-landscape-icon {
+    font-size: 31px;
+
+    margin-bottom: 10px;
+  }
+
+  .chapter3-landscape-label {
+    font-size: 8px;
+
+    letter-spacing: 3px;
+  }
+
+  .chapter3-landscape-hint h2 {
+    font-size: 20px;
+
+    letter-spacing: 2px;
+  }
+
+  .chapter3-landscape-hint p {
+    font-size: 11px;
+
+    line-height: 1.75;
+  }
+
+  .chapter3-landscape-phone {
+    margin-top: 16px;
+    margin-bottom: 10px;
+  }
+
+  .chapter3-gate-ready strong {
+    font-size: 12px;
+
+    letter-spacing: 1.5px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .chapter3-landscape-hint {
+    width:
+      calc(100vw - 30px);
+
+    padding:
+      22px
+      18px
+      21px;
+  }
+
+  .chapter3-landscape-hint h2 {
+    font-size: 18px;
+  }
+
+}

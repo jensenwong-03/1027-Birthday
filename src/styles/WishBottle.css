@@ -25,6 +25,9 @@
     "Noto Sans SC",
     "Microsoft YaHei",
     sans-serif;
+
+  /* Prevent accidental browser gestures on mobile */
+  touch-action: none;
 }
 
 
@@ -85,6 +88,8 @@
 
   padding:
     0 10px;
+
+  pointer-events: none;
 }
 
 
@@ -122,8 +127,15 @@
       0.52
     );
 
+  /*
+    backdrop-filter is visually expensive on mobile.
+    Keep it subtle instead of increasing blur.
+  */
   backdrop-filter:
-    blur(12px);
+    blur(8px);
+
+  -webkit-backdrop-filter:
+    blur(8px);
 
   box-shadow:
     0 0 25px
@@ -163,8 +175,13 @@
 .shield {
   font-size: 17px;
 
+  /*
+    Only opacity/color transition.
+    No transform/filter animation during gameplay.
+  */
   transition:
-    all 0.3s ease;
+    opacity 0.2s ease,
+    color 0.2s ease;
 }
 
 
@@ -292,8 +309,16 @@
         0.7
       );
 
+  /*
+    Short transition only.
+    Prevents a long animation from stacking
+    when several stars are collected quickly.
+  */
   transition:
-    width 0.35s ease;
+    width 0.12s linear;
+
+  will-change:
+    width;
 }
 
 
@@ -372,6 +397,21 @@
 
   touch-action:
     none;
+
+  -webkit-user-select:
+    none;
+
+  user-select:
+    none;
+
+  /*
+    Isolate the gameplay rendering area.
+    This helps prevent updates inside the game
+    from affecting the rest of the page.
+  */
+  contain:
+    layout
+    paint;
 }
 
 
@@ -413,8 +453,28 @@
         255,
         0.55
       );
+
+  /*
+    The game moves stars with JS transform.
+    Keep this as the only continuous compositing layer.
+  */
+  will-change:
+    transform;
+
+  backface-visibility:
+    hidden;
+
+  -webkit-backface-visibility:
+    hidden;
+
+  transform:
+    translateZ(0);
 }
 
+
+/* =========================================================
+   SPECIAL STAR
+========================================================= */
 
 .special-star {
   color:
@@ -439,27 +499,43 @@
         220,
         120,
         0.8
+      ),
+    0 0 45px
+      rgba(
+        255,
+        205,
+        80,
+        0.35
       );
 
-  animation:
-    specialStarPulse
-    0.9s
-    ease-in-out
-    infinite alternate;
-}
+  /*
+    IMPORTANT:
+    No CSS animation here.
 
+    The star's transform is controlled entirely
+    by requestAnimationFrame.
 
-@keyframes specialStarPulse {
+    This prevents:
+      CSS transform animation
+      +
+      JS transform
+    from fighting each other.
+  */
 
-  from {
-    filter:
-      brightness(1);
-  }
+  will-change:
+    transform;
 
-  to {
-    filter:
-      brightness(1.45);
-  }
+  backface-visibility:
+    hidden;
+
+  -webkit-backface-visibility:
+    hidden;
+
+  pointer-events:
+    none;
+
+  user-select:
+    none;
 }
 
 
@@ -488,8 +564,27 @@
   touch-action:
     none;
 
+  /*
+    Bottle position is controlled by JS.
+  */
+  will-change:
+    transform;
+
+  backface-visibility:
+    hidden;
+
+  -webkit-backface-visibility:
+    hidden;
+
+  transform:
+    translateZ(0);
+
+  /*
+    Only brightness transition.
+    No transform transition because JS controls it.
+  */
   transition:
-    filter 0.15s ease;
+    filter 0.12s ease;
 }
 
 
@@ -500,8 +595,13 @@
   filter:
     brightness(1.12);
 
-  transform:
-    translateY(-2px);
+  /*
+    IMPORTANT:
+    Do NOT transform here.
+
+    The bottle position is controlled by
+    requestAnimationFrame / JS.
+  */
 }
 
 
@@ -555,8 +655,14 @@
       )
     );
 
+  /*
+    Reduced blur compared with original.
+  */
   backdrop-filter:
-    blur(4px);
+    blur(3px);
+
+  -webkit-backdrop-filter:
+    blur(3px);
 }
 
 
@@ -607,8 +713,15 @@
       )
     );
 
+  /*
+    Keep bottle glass effect but reduce
+    the amount of blur during gameplay.
+  */
   backdrop-filter:
-    blur(5px);
+    blur(4px);
+
+  -webkit-backdrop-filter:
+    blur(4px);
 
   box-shadow:
     inset 0 0 18px
@@ -626,7 +739,8 @@
         0.12
       );
 
-  overflow: hidden;
+  overflow:
+    hidden;
 }
 
 
@@ -651,7 +765,8 @@
       transparent 65%
     );
 
-  pointer-events: none;
+  pointer-events:
+    none;
 }
 
 
@@ -694,6 +809,15 @@
         255,
         0.9
       );
+
+  /*
+    This container is updated directly by JS
+    when possible. Prevent unnecessary layout
+    propagation.
+  */
+  contain:
+    layout
+    paint;
 }
 
 
@@ -738,8 +862,15 @@
       0.65
     );
 
+  /*
+    Slightly reduced blur.
+    This element can appear repeatedly during gameplay.
+  */
   backdrop-filter:
-    blur(12px);
+    blur(7px);
+
+  -webkit-backdrop-filter:
+    blur(7px);
 
   color:
     rgba(
@@ -758,34 +889,38 @@
   pointer-events:
     none;
 
-  animation:
-    messageAppear
-    0.25s
-    ease-out;
+  /*
+    IMPORTANT:
+    The message should NOT run a CSS animation
+    every time a star is collected.
+
+    JS can toggle .wish-message-visible.
+  */
+
+  opacity:
+    0;
+
+  visibility:
+    hidden;
+
+  transition:
+    opacity 0.16s ease,
+    visibility 0s linear 0.16s;
+
+  will-change:
+    opacity;
 }
 
 
-@keyframes messageAppear {
+.wish-message.wish-message-visible {
+  opacity:
+    1;
 
-  from {
-    opacity: 0;
+  visibility:
+    visible;
 
-    transform:
-      translate(
-        -50%,
-        calc(-50% + 8px)
-      );
-  }
-
-  to {
-    opacity: 1;
-
-    transform:
-      translate(
-        -50%,
-        -50%
-      );
-  }
+  transition:
+    opacity 0.16s ease;
 }
 
 
@@ -828,7 +963,10 @@
     );
 
   backdrop-filter:
-    blur(8px);
+    blur(7px);
+
+  -webkit-backdrop-filter:
+    blur(7px);
 }
 
 
@@ -881,7 +1019,10 @@
     );
 
   backdrop-filter:
-    blur(18px);
+    blur(14px);
+
+  -webkit-backdrop-filter:
+    blur(14px);
 
   box-shadow:
     0 0 60px
@@ -1335,10 +1476,15 @@
     pointer;
 
   transition:
-    all 0.3s ease;
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
 
   overflow:
     hidden;
+
+  touch-action:
+    manipulation;
 }
 
 
@@ -1484,6 +1630,9 @@
     );
 
   backdrop-filter:
+    blur(4px);
+
+  -webkit-backdrop-filter:
     blur(4px);
 
   overflow:
@@ -1979,7 +2128,10 @@
     );
 
   backdrop-filter:
-    blur(12px);
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
 
   animation:
     resultOverlay
@@ -2348,7 +2500,13 @@
     pointer;
 
   transition:
-    all 0.3s ease;
+    border-color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+
+  touch-action:
+    manipulation;
 }
 
 
@@ -2422,6 +2580,1001 @@
 
   z-index:
     20;
+
+  pointer-events:
+    none;
+}
+
+
+/* =========================================================
+   SECOND STAR WISH
+   YELLOW STAR REWARD
+========================================================= */
+
+.wish-reward-overlay {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  z-index:
+    200;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  overflow:
+    hidden;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(
+        150,
+        105,
+        8,
+        0.30
+      ),
+      rgba(
+        5,
+        3,
+        15,
+        0.96
+      ) 70%
+    );
+
+  animation:
+    rewardBackgroundIn
+    .7s
+    ease
+    both;
+
+  contain:
+    paint;
+}
+
+
+.wish-reward-particle-field {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  pointer-events:
+    none;
+}
+
+
+.wish-reward-particle {
+  position:
+    absolute;
+
+  left:
+    50%;
+
+  top:
+    50%;
+
+  font-size:
+    calc(
+      8px + var(--i) * .45px
+    );
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .9
+    );
+
+  text-shadow:
+    0 0 8px white,
+    0 0 18px
+      rgba(
+        255,
+        220,
+        70,
+        .9
+      );
+
+  opacity:
+    0;
+
+  animation:
+    rewardParticle
+    2.8s
+    ease-out
+    infinite;
+
+  animation-delay:
+    calc(
+      var(--i) * -0.09s
+    );
+}
+
+
+.wish-reward-particle:nth-child(3n) {
+  color:
+    rgba(
+      255,
+      215,
+      60,
+      .95
+    );
+}
+
+
+.wish-reward-particle:nth-child(3n + 1) {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .95
+    );
+}
+
+
+.wish-reward-particle:nth-child(3n + 2) {
+  color:
+    rgba(
+      255,
+      240,
+      150,
+      .95
+    );
+}
+
+
+.wish-reward-rings {
+  position:
+    absolute;
+
+  width:
+    430px;
+
+  height:
+    430px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  pointer-events:
+    none;
+}
+
+
+.wish-reward-ring {
+  position:
+    absolute;
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  border-radius:
+    50%;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      215,
+      70,
+      .18
+    );
+
+  box-shadow:
+    0 0 25px
+      rgba(
+        255,
+        205,
+        40,
+        .12
+      ),
+    inset 0 0 25px
+      rgba(
+        255,
+        205,
+        40,
+        .08
+      );
+
+  transform:
+    scale(.2);
+
+  opacity:
+    0;
+}
+
+
+.wish-ring-one {
+  animation:
+    rewardRingOne
+    2.8s
+    ease-out
+    both;
+}
+
+
+.wish-ring-two {
+  animation:
+    rewardRingTwo
+    2.8s
+    ease-out
+    both;
+}
+
+
+.wish-ring-three {
+  animation:
+    rewardRingThree
+    2.8s
+    ease-out
+    both;
+}
+
+
+.wish-reward-yellow-star {
+  position:
+    relative;
+
+  z-index:
+    10;
+
+  width:
+    170px;
+
+  height:
+    170px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  transform:
+    scale(.1);
+
+  opacity:
+    0;
+}
+
+
+.wish-reward-appear
+.wish-reward-yellow-star {
+  animation:
+    redStarAppear
+    1s
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    )
+    both;
+}
+
+
+.wish-reward-glow
+.wish-reward-yellow-star {
+  animation:
+    redStarGlow
+    1.8s
+    ease-in-out
+    both;
+}
+
+
+.wish-reward-burst
+.wish-reward-yellow-star {
+  animation:
+    redStarBurst
+    1.2s
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    )
+    both;
+}
+
+
+.wish-reward-star-halo {
+  position:
+    absolute;
+
+  width:
+    180px;
+
+  height:
+    180px;
+
+  border-radius:
+    50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        255,
+        220,
+        60,
+        .55
+      ),
+      rgba(
+        255,
+        195,
+        20,
+        .22
+      ) 35%,
+      transparent 72%
+    );
+
+  filter:
+    blur(10px);
+
+  pointer-events:
+    none;
+}
+
+
+.wish-reward-star-core {
+  position:
+    relative;
+
+  z-index:
+    3;
+
+  font-size:
+    145px;
+
+  line-height:
+    1;
+
+  color:
+    #ffd84d;
+
+  text-shadow:
+    0 0 8px #fff,
+    0 0 18px #fff0a0,
+    0 0 35px #ffd43d,
+    0 0 65px #ffc928,
+    0 0 100px
+      rgba(
+        255,
+        205,
+        30,
+        .9
+      ),
+    0 0 150px
+      rgba(
+        255,
+        190,
+        20,
+        .65
+      );
+}
+
+
+.wish-reward-star-shine {
+  position:
+    absolute;
+
+  z-index:
+    5;
+
+  top:
+    6px;
+
+  right:
+    10px;
+
+  font-size:
+    34px;
+
+  color:
+    white;
+
+  text-shadow:
+    0 0 10px white,
+    0 0 25px #fff0a8;
+
+  animation:
+    rewardShine
+    1.4s
+    ease-in-out
+    infinite;
+}
+
+
+.wish-reward-star-rays {
+  position:
+    absolute;
+
+  width:
+    260px;
+
+  height:
+    260px;
+
+  border-radius:
+    50%;
+
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      rgba(
+        255,
+        215,
+        55,
+        .25
+      ),
+      transparent 10%,
+      transparent 20%,
+      rgba(
+        255,
+        225,
+        90,
+        .18
+      ),
+      transparent 30%,
+      transparent 45%,
+      rgba(
+        255,
+        210,
+        50,
+        .22
+      ),
+      transparent 55%,
+      transparent 70%,
+      rgba(
+        255,
+        230,
+        100,
+        .2
+      ),
+      transparent 80%,
+      transparent
+    );
+
+  filter:
+    blur(4px);
+
+  animation:
+    rayRotate
+    5s
+    linear
+    infinite;
+
+  pointer-events:
+    none;
+}
+
+
+.wish-reward-text {
+  position:
+    absolute;
+
+  z-index:
+    20;
+
+  top:
+    calc(
+      50% + 125px
+    );
+
+  width:
+    100%;
+
+  text-align:
+    center;
+
+  opacity:
+    0;
+
+  transform:
+    translateY(20px);
+}
+
+
+.wish-reward-glow
+.wish-reward-text {
+  animation:
+    rewardTextIn
+    .8s
+    .25s
+    ease-out
+    both;
+}
+
+
+.wish-reward-burst
+.wish-reward-text {
+  animation:
+    rewardTextFinal
+    .8s
+    ease-out
+    both;
+}
+
+
+.wish-reward-small-text {
+  font-size:
+    11px;
+
+  letter-spacing:
+    5px;
+
+  color:
+    rgba(
+      255,
+      225,
+      125,
+      .7
+    );
+
+  margin-bottom:
+    10px;
+}
+
+
+.wish-reward-text h2 {
+  margin:
+    0;
+
+  font-size:
+    30px;
+
+  font-weight:
+    600;
+
+  letter-spacing:
+    5px;
+
+  color:
+    white;
+
+  text-shadow:
+    0 0 10px white,
+    0 0 25px #ffd84d,
+    0 0 45px
+      rgba(
+        255,
+        205,
+        50,
+        .8
+      );
+}
+
+
+.wish-reward-text p {
+  margin-top:
+    12px;
+
+  font-size:
+    14px;
+
+  line-height:
+    1.9;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .62
+    );
+}
+
+
+.wish-reward-flash {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  z-index:
+    40;
+
+  pointer-events:
+    none;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(
+        255,
+        255,
+        255,
+        1
+      ),
+      rgba(
+        255,
+        235,
+        145,
+        .85
+      ) 18%,
+      rgba(
+        255,
+        205,
+        45,
+        .25
+      ) 40%,
+      transparent 70%
+    );
+
+  opacity:
+    0;
+}
+
+
+.wish-reward-burst
+.wish-reward-flash {
+  animation:
+    rewardFlash
+    1.2s
+    2s
+    ease-out
+    both;
+}
+
+
+/* =========================================================
+   REWARD KEYFRAMES
+========================================================= */
+
+@keyframes rewardBackgroundIn {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      scale(1.08);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      scale(1);
+  }
+}
+
+
+@keyframes rewardParticle {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      rotate(0deg)
+      scale(.3);
+  }
+
+  20% {
+    opacity:
+      1;
+  }
+
+  100% {
+    opacity:
+      0;
+
+    transform:
+      translate(
+        calc(
+          -50% +
+          (var(--i) - 14) * 34px
+        ),
+        calc(
+          -50% +
+          (var(--i) - 14) * 24px
+        )
+      )
+      rotate(180deg)
+      scale(1.3);
+  }
+}
+
+
+@keyframes rewardRingOne {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(.2);
+  }
+
+  35% {
+    opacity:
+      .8;
+  }
+
+  100% {
+    opacity:
+      0;
+
+    transform:
+      scale(1.25);
+  }
+}
+
+
+@keyframes rewardRingTwo {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(.1);
+  }
+
+  45% {
+    opacity:
+      .6;
+  }
+
+  100% {
+    opacity:
+      0;
+
+    transform:
+      scale(1.55);
+  }
+}
+
+
+@keyframes rewardRingThree {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(.05);
+  }
+
+  55% {
+    opacity:
+      .45;
+  }
+
+  100% {
+    opacity:
+      0;
+
+    transform:
+      scale(1.9);
+  }
+}
+
+
+@keyframes redStarAppear {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(.05)
+      rotate(-25deg);
+  }
+
+  45% {
+    opacity:
+      1;
+
+    transform:
+      scale(1.18)
+      rotate(8deg);
+  }
+
+  70% {
+    transform:
+      scale(.94)
+      rotate(-3deg);
+  }
+
+  100% {
+    opacity:
+      1;
+
+    transform:
+      scale(1)
+      rotate(0deg);
+  }
+}
+
+
+@keyframes redStarGlow {
+
+  0% {
+    opacity:
+      1;
+
+    transform:
+      scale(1);
+  }
+
+  50% {
+    transform:
+      scale(1.13);
+  }
+
+  100% {
+    opacity:
+      1;
+
+    transform:
+      scale(1.06);
+  }
+}
+
+
+@keyframes redStarBurst {
+
+  0% {
+    opacity:
+      1;
+
+    transform:
+      scale(1.06);
+  }
+
+  45% {
+    transform:
+      scale(1.28);
+  }
+
+  100% {
+    opacity:
+      .92;
+
+    transform:
+      scale(1.12);
+  }
+}
+
+
+@keyframes rewardShine {
+
+  0%,
+  100% {
+    transform:
+      scale(.8)
+      rotate(0deg);
+
+    opacity:
+      .65;
+  }
+
+  50% {
+    transform:
+      scale(1.35)
+      rotate(20deg);
+
+    opacity:
+      1;
+  }
+}
+
+
+@keyframes rayRotate {
+
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+
+@keyframes rewardTextIn {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(25px);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+
+@keyframes rewardTextFinal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(15px)
+      scale(.96);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+@keyframes rewardFlash {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(.5);
+  }
+
+  35% {
+    opacity:
+      .9;
+  }
+
+  100% {
+    opacity:
+      0;
+
+    transform:
+      scale(1.8);
+  }
 }
 
 
@@ -2583,7 +3736,7 @@
       8px;
 
     letter-spacing:
-      0.8px;
+      .8px;
   }
 
 
@@ -2655,331 +3808,133 @@
       3px;
   }
 
+
+  .wish-reward-rings {
+    width:
+      300px;
+
+    height:
+      300px;
+  }
+
+
+  .wish-reward-yellow-star {
+    width:
+      140px;
+
+    height:
+      140px;
+  }
+
+
+  .wish-reward-star-core {
+    font-size:
+      120px;
+  }
+
+
+  .wish-reward-star-halo {
+    width:
+      150px;
+
+    height:
+      150px;
+  }
+
+
+  .wish-reward-star-rays {
+    width:
+      210px;
+
+    height:
+      210px;
+  }
+
+
+  .wish-reward-text {
+    top:
+      calc(
+        50% + 105px
+      );
+  }
+
+
+  .wish-reward-text h2 {
+    font-size:
+      25px;
+
+    letter-spacing:
+      4px;
+  }
+
+
+  .wish-reward-text p {
+    padding:
+      0 20px;
+
+    font-size:
+      12px;
+  }
+
 }
 
 
 /* =========================================================
-   第二颗星愿：黄色星星奖励动画
-   与第一关红色星星完全相同的动画节奏
+   GPU / INPUT SAFETY
 ========================================================= */
 
-.wish-reward-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(150, 105, 8, 0.30),
-      rgba(5, 3, 15, 0.96) 70%
-    );
-  animation: rewardBackgroundIn .7s ease both;
-}
+.wish-game-area,
+.wish-bottle,
+.falling-star {
+  -webkit-user-select:
+    none;
 
-.wish-reward-particle-field {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
+  user-select:
+    none;
 
-.wish-reward-particle {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  font-size: calc(8px + var(--i) * .45px);
-  color: rgba(255,255,255,.9);
-  text-shadow:
-    0 0 8px white,
-    0 0 18px rgba(255,220,70,.9);
-  opacity: 0;
-  animation: rewardParticle 2.8s ease-out infinite;
-  animation-delay: calc(var(--i) * -0.09s);
-}
-
-.wish-reward-particle:nth-child(3n) {
-  color: rgba(255,215,60,.95);
-}
-
-.wish-reward-particle:nth-child(3n + 1) {
-  color: rgba(255,255,255,.95);
-}
-
-.wish-reward-particle:nth-child(3n + 2) {
-  color: rgba(255,240,150,.95);
-}
-
-.wish-reward-rings {
-  position: absolute;
-  width: 430px;
-  height: 430px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wish-reward-ring {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 1px solid rgba(255,215,70,.18);
-  box-shadow:
-    0 0 25px rgba(255,205,40,.12),
-    inset 0 0 25px rgba(255,205,40,.08);
-  transform: scale(.2);
-  opacity: 0;
-}
-
-.wish-ring-one { animation: rewardRingOne 2.8s ease-out both; }
-.wish-ring-two { animation: rewardRingTwo 2.8s ease-out both; }
-.wish-ring-three { animation: rewardRingThree 2.8s ease-out both; }
-
-.wish-reward-yellow-star {
-  position: relative;
-  z-index: 10;
-  width: 170px;
-  height: 170px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: scale(.1);
-  opacity: 0;
-}
-
-.wish-reward-appear .wish-reward-yellow-star {
-  animation: redStarAppear 1s cubic-bezier(.16,1,.3,1) both;
-}
-
-.wish-reward-glow .wish-reward-yellow-star {
-  animation: redStarGlow 1.8s ease-in-out both;
-}
-
-.wish-reward-burst .wish-reward-yellow-star {
-  animation: redStarBurst 1.2s cubic-bezier(.16,1,.3,1) both;
-}
-
-.wish-reward-star-halo {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background:
-    radial-gradient(
-      circle,
-      rgba(255,220,60,.55),
-      rgba(255,195,20,.22) 35%,
-      transparent 72%
-    );
-  filter: blur(10px);
-}
-
-.wish-reward-star-core {
-  position: relative;
-  z-index: 3;
-  font-size: 145px;
-  line-height: 1;
-  color: #ffd84d;
-  text-shadow:
-    0 0 8px #fff,
-    0 0 18px #fff0a0,
-    0 0 35px #ffd43d,
-    0 0 65px #ffc928,
-    0 0 100px rgba(255,205,30,.9),
-    0 0 150px rgba(255,190,20,.65);
-}
-
-.wish-reward-star-shine {
-  position: absolute;
-  z-index: 5;
-  top: 6px;
-  right: 10px;
-  font-size: 34px;
-  color: white;
-  text-shadow:
-    0 0 10px white,
-    0 0 25px #fff0a8;
-  animation: rewardShine 1.4s ease-in-out infinite;
-}
-
-.wish-reward-star-rays {
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent,
-      rgba(255,215,55,.25),
-      transparent 10%,
-      transparent 20%,
-      rgba(255,225,90,.18),
-      transparent 30%,
-      transparent 45%,
-      rgba(255,210,50,.22),
-      transparent 55%,
-      transparent 70%,
-      rgba(255,230,100,.2),
-      transparent 80%,
-      transparent
-    );
-  filter: blur(4px);
-  animation: rayRotate 5s linear infinite;
-}
-
-.wish-reward-text {
-  position: absolute;
-  z-index: 20;
-  top: calc(50% + 125px);
-  width: 100%;
-  text-align: center;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.wish-reward-glow .wish-reward-text {
-  animation: rewardTextIn .8s .25s ease-out both;
-}
-
-.wish-reward-burst .wish-reward-text {
-  animation: rewardTextFinal .8s ease-out both;
-}
-
-.wish-reward-small-text {
-  font-size: 11px;
-  letter-spacing: 5px;
-  color: rgba(255,225,125,.7);
-  margin-bottom: 10px;
-}
-
-.wish-reward-text h2 {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 600;
-  letter-spacing: 5px;
-  color: white;
-  text-shadow:
-    0 0 10px white,
-    0 0 25px #ffd84d,
-    0 0 45px rgba(255,205,50,.8);
-}
-
-.wish-reward-text p {
-  margin-top: 12px;
-  font-size: 14px;
-  line-height: 1.9;
-  color: rgba(255,255,255,.62);
-}
-
-.wish-reward-flash {
-  position: absolute;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(255,255,255,1),
-      rgba(255,235,145,.85) 18%,
-      rgba(255,205,45,.25) 40%,
-      transparent 70%
-    );
-  opacity: 0;
-}
-
-.wish-reward-burst .wish-reward-flash {
-  animation: rewardFlash 1.2s 2s ease-out both;
+  -webkit-touch-callout:
+    none;
 }
 
 
-/* Shared transition keyframes — identical timing to Chapter 1 */
-@keyframes rewardBackgroundIn {
-  from { opacity: 0; transform: scale(1.08); }
-  to { opacity: 1; transform: scale(1); }
+.wish-game-area {
+  touch-action:
+    none;
 }
 
-@keyframes rewardParticle {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(0deg) scale(.3);
+
+.wish-bottle {
+  touch-action:
+    none;
+}
+
+
+.falling-star {
+  pointer-events:
+    none;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   Prevents unnecessary animation load when the
+   browser/device requests reduced motion.
+========================================================= */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+
+  .wish-reward-particle,
+  .wish-reward-ring,
+  .wish-reward-star-shine,
+  .wish-reward-star-rays,
+  .orbit-one,
+  .orbit-two,
+  .countdown-glow,
+  .briefing-symbol {
+    animation:
+      none !important;
   }
-  20% { opacity: 1; }
-  100% {
-    opacity: 0;
-    transform:
-      translate(
-        calc(-50% + (var(--i) - 14) * 34px),
-        calc(-50% + (var(--i) - 14) * 24px)
-      )
-      rotate(180deg)
-      scale(1.3);
-  }
-}
 
-@keyframes rewardRingOne {
-  0% { opacity: 0; transform: scale(.2); }
-  35% { opacity: .8; }
-  100% { opacity: 0; transform: scale(1.25); }
-}
-
-@keyframes rewardRingTwo {
-  0% { opacity: 0; transform: scale(.1); }
-  45% { opacity: .6; }
-  100% { opacity: 0; transform: scale(1.55); }
-}
-
-@keyframes rewardRingThree {
-  0% { opacity: 0; transform: scale(.05); }
-  55% { opacity: .45; }
-  100% { opacity: 0; transform: scale(1.9); }
-}
-
-@keyframes redStarAppear {
-  0% { opacity: 0; transform: scale(.05) rotate(-25deg); }
-  45% { opacity: 1; transform: scale(1.18) rotate(8deg); }
-  70% { transform: scale(.94) rotate(-3deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-
-@keyframes redStarGlow {
-  0% { opacity: 1; transform: scale(1); }
-  50% { transform: scale(1.13); }
-  100% { opacity: 1; transform: scale(1.06); }
-}
-
-@keyframes redStarBurst {
-  0% { opacity: 1; transform: scale(1.06); }
-  45% { transform: scale(1.28); }
-  100% { opacity: .92; transform: scale(1.12); }
-}
-
-@keyframes rewardShine {
-  0%, 100% { transform: scale(.8) rotate(0deg); opacity: .65; }
-  50% { transform: scale(1.35) rotate(20deg); opacity: 1; }
-}
-
-@keyframes rayRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes rewardTextIn {
-  from { opacity: 0; transform: translateY(25px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes rewardTextFinal {
-  from { opacity: 0; transform: translateY(15px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes rewardFlash {
-  0% { opacity: 0; transform: scale(.5); }
-  35% { opacity: .9; }
-  100% { opacity: 0; transform: scale(1.8); }
 }

@@ -30,6 +30,58 @@
 }
 
 /* =========================================================
+   VIDEO PERFORMANCE MODE
+   ========================================================= */
+
+.video-open .final-particle-canvas,
+.video-open .final-nebula {
+  display: none !important;
+}
+
+.video-open .memory-video-backdrop {
+  filter: none;
+}
+
+.memory-video-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  pointer-events: none;
+  color: rgba(235, 248, 255, 0.78);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 18px rgba(170, 225, 255, 0.35);
+}
+
+.memory-video-loading-star {
+  display: inline-block;
+  animation: videoLoadingPulse 1.25s ease-in-out infinite;
+}
+
+.memory-video-frame video {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  contain: paint;
+}
+
+@keyframes videoLoadingPulse {
+  0%,
+  100% {
+    opacity: 0.38;
+    transform: scale(0.86);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* =========================================================
    PARTICLES
    ========================================================= */
 
@@ -1917,7 +1969,7 @@
       transparent 45%
     );
 
-  filter: blur(30px);
+  filter: blur(22px);
 }
 
 .memory-video-shell {
@@ -3001,5 +3053,286 @@ body::-webkit-scrollbar,
   inset: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   LETTER — TRUE FIT-SCREEN MODE
+   Keeps the full birthday blessing inside one viewport.
+   ========================================================= */
+
+html.final-reward-lock,
+html.final-reward-lock body,
+html.final-reward-lock #root {
+  overflow: hidden !important;
+}
+
+.reward-letter-layer {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  padding: clamp(10px, 2.5vh, 28px) clamp(12px, 3vw, 30px) !important;
+}
+
+.letter-card {
+  width: min(700px, 94vw) !important;
+  max-width: 700px !important;
+  max-height: calc(100dvh - clamp(20px, 5vh, 56px)) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+
+  padding:
+    clamp(20px, 4.8vh, 52px)
+    clamp(20px, 5vw, 62px)
+    clamp(16px, 4vh, 42px) !important;
+}
+
+.letter-topline {
+  font-size: clamp(8px, 1.45vh, 10px) !important;
+  letter-spacing: clamp(0.28em, 0.75vw, 0.4em) !important;
+}
+
+.letter-symbol {
+  margin:
+    clamp(8px, 2.2vh, 22px)
+    0
+    clamp(7px, 1.6vh, 15px) !important;
+  font-size: clamp(20px, 3.2vh, 28px) !important;
+}
+
+.letter-card h2 {
+  font-size: clamp(22px, 5.1vh, 43px) !important;
+  line-height: 1.12 !important;
+  letter-spacing: clamp(0.06em, 0.5vw, 0.12em) !important;
+  white-space: nowrap;
+}
+
+.letter-divider {
+  gap: clamp(7px, 1.5vw, 12px) !important;
+  margin:
+    clamp(10px, 2.2vh, 23px)
+    0
+    clamp(10px, 2.5vh, 25px) !important;
+}
+
+.letter-divider span {
+  width: clamp(32px, 5vw, 55px) !important;
+}
+
+.letter-copy {
+  width: 100% !important;
+  max-width: 540px !important;
+  font-size: clamp(10.5px, 1.65vh, 14px) !important;
+  line-height: clamp(1.58, 1.86, 2.05) !important;
+}
+
+.letter-copy p {
+  margin: 0 0 clamp(7px, 1.65vh, 17px) !important;
+}
+
+.letter-copy p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.letter-sign {
+  margin-top: clamp(10px, 2.2vh, 24px) !important;
+  font-size: clamp(11px, 1.85vh, 15px) !important;
+  line-height: 1.2 !important;
+}
+
+.letter-back {
+  margin-top: clamp(9px, 2vh, 22px) !important;
+  padding: clamp(6px, 1vh, 9px) clamp(14px, 2vw, 20px) !important;
+  font-size: clamp(8px, 1.25vh, 10px) !important;
+  flex: 0 0 auto;
+}
+
+/* Short screens / landscape phones */
+@media (max-height: 700px) {
+  .reward-letter-layer {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .letter-card {
+    padding-top: 17px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .letter-symbol {
+    margin-top: 6px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .letter-divider {
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .letter-copy {
+    font-size: clamp(9.5px, 1.75vh, 12px) !important;
+    line-height: 1.58 !important;
+  }
+
+  .letter-copy p {
+    margin-bottom: 6px !important;
+  }
+
+  .letter-sign {
+    margin-top: 9px !important;
+    font-size: 11px !important;
+  }
+
+  .letter-back {
+    margin-top: 8px !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+  }
+}
+
+/* Small phones */
+@media (max-width: 430px) {
+  .reward-letter-layer {
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+  }
+
+  .letter-card {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .letter-card h2 {
+    font-size: clamp(20px, 6.2vw, 30px) !important;
+    white-space: normal;
+  }
+
+  .letter-copy {
+    font-size: clamp(10px, 3.15vw, 13px) !important;
+    line-height: 1.72 !important;
+  }
+
+  .letter-copy p {
+    margin-bottom: 7px !important;
+  }
+}
+
+/* =========================================================
+   BIRTHDAY LETTER — KEEP ORIGINAL CARD SIZE
+   Fit the viewport without shrinking/compressing the card.
+   ========================================================= */
+
+.reward-letter-layer {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  padding: 20px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.letter-card {
+  width: min(700px, 94vw) !important;
+  max-width: 700px !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+
+  /* Restore original card spacing */
+  padding:
+    55px
+    clamp(25px, 6vw, 70px)
+    48px !important;
+}
+
+.letter-topline {
+  font-size: 10px !important;
+  letter-spacing: 0.4em !important;
+}
+
+.letter-symbol {
+  margin: 24px 0 15px !important;
+  font-size: 28px !important;
+}
+
+.letter-card h2 {
+  font-size: clamp(29px, 5vw, 45px) !important;
+  line-height: normal !important;
+  letter-spacing: 0.12em !important;
+}
+
+.letter-divider {
+  gap: 12px !important;
+  margin: 23px 0 27px !important;
+}
+
+.letter-divider span {
+  width: 55px !important;
+}
+
+.letter-copy {
+  width: auto !important;
+  max-width: 540px !important;
+  font-size: 14px !important;
+  line-height: 2.15 !important;
+}
+
+.letter-copy p {
+  margin: 0 0 19px !important;
+}
+
+.letter-copy p:last-child {
+  margin-bottom: 19px !important;
+}
+
+.letter-sign {
+  margin-top: 28px !important;
+  font-size: 15px !important;
+  line-height: normal !important;
+}
+
+.letter-back {
+  margin-top: 28px !important;
+  padding: 9px 20px !important;
+  font-size: 10px !important;
+}
+
+/* Keep the original mobile card size rules rather than compressing it. */
+@media (max-width: 680px) {
+  .reward-letter-layer {
+    padding: 20px 12px !important;
+  }
+
+  .letter-card {
+    width: min(700px, 94vw) !important;
+    max-width: 700px !important;
+    padding: 40px clamp(25px, 6vw, 70px) 35px !important;
+  }
+
+  .letter-copy {
+    font-size: 13px !important;
+    line-height: 2 !important;
+  }
+}
+
+/* Do not create page scrolling while keeping the card itself unchanged. */
+html.final-reward-lock,
+html.final-reward-lock body,
+html.final-reward-lock #root,
+.final-reward,
+.reward-letter-layer {
   overflow: hidden !important;
 }
